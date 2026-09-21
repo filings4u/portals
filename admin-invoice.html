@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+
+
+
+
+
+
+
+
+
+
+<meta name="theme-color" content="#24467f"><title>Invoice | screenings4u Management Portal</title>
+
+<link href="images/fav.png" rel="icon" type="image/png">
+<link rel="stylesheet" href="assets/css/admin-lms.css">
+<link rel="stylesheet" href="assets/css/admin-invoice.css">
+<link rel="stylesheet" href="assets/css/enterprise-portal.css?v=20260918-dashboard-v5">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/lms-ui-modals.css?v=20260918-modal-fix-1">
+<link rel="stylesheet" href="assets/css/brand-system.css?v=20260918-dashboard-fix-v1">
+</head>
+<body>
+    <div class="admin-lms-app">
+        <div id="admin-lms-sidebar-target"></div>
+        <main class="admin-lms-main"><header class="admin-lms-topbar">
+            <div class="admin-lms-topbar-left"><button type="button" class="admin-lms-sidebar-collapse" data-admin-sidebar-collapse aria-label="Collapse sidebar" aria-expanded="true">
+                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6">
+
+                </path></svg></button>
+                <div class="admin-lms-page-context"><small>BILLING & OPERATIONS</small>
+                <strong>Invoice</strong></div></div></header><section class="invoice-page"><div class="invoice-wrap"><header class="invoice-heading"><div><span class="invoice-kicker">INVOICE WORKSPACE</span><h1 id="pageTitle">New Invoice</h1><p>Create, preview, send, collect and manage one complete invoice.</p></div><div class="invoice-actions"><a class="invoice-btn" href="admin-invoices.html">← Back to Invoices</a></div></header><div id="message" class="invoice-message"></div><div id="editPane"><section class="invoice-card"><h2>Customer / Employer</h2><p class="invoice-desc">Choose a saved account or enter billing details manually.</p><div class="invoice-grid"><label class="invoice-field"><span>Issuing Company *</span><select id="issuerEntity"></select></label><label class="invoice-field"><span>Recipient Type</span><select id="recipientType"><option value="customer">Customer</option><option value="employer">Employer</option></select></label><label class="invoice-field"><span>Existing Recipient</span><select id="recipient"></select></label><label class="invoice-field"><span>Status</span><select id="status"><option>draft</option><option>open</option><option>sent</option><option>partially_paid</option><option>paid</option><option>past_due</option><option>void</option><option>uncollectible</option></select></label><label class="invoice-field"><span>Name *</span><input id="customerName"></label><label class="invoice-field"><span>Email *</span><input id="customerEmail" type="email"></label><label class="invoice-field"><span>Issue Date</span><input id="issueDate" type="date"></label><label class="invoice-field"><span>Due Date</span><input id="dueDate" type="date"></label><label class="invoice-field"><span>Amount Already Paid</span><input id="amountPaid" type="number" min="0" step=".01" value="0"></label><label class="invoice-field"><span>Address</span><input id="address1"></label><label class="invoice-field"><span>Address 2</span><input id="address2"></label><label class="invoice-field"><span>City</span><input id="city"></label><label class="invoice-field"><span>State</span><input id="state"></label><label class="invoice-field"><span>ZIP</span><input id="postal"></label></div></section><section class="invoice-card"><h2>Invoice Services</h2><p class="invoice-desc">Add services, quantities and discounts. Customer sales tax is not charged.</p><div class="invoice-addrow"><label class="invoice-field service-field"><span>Service</span><select id="service"></select></label><label class="invoice-field"><span>Price</span><input id="price" type="number" step=".01"></label><label class="invoice-field"><span>Qty</span><input id="qty" type="number" value="1" min=".01" step=".01"></label><label class="invoice-field"><span>Discount</span><input id="discount" type="number" value="0" min="0" step=".01"></label><button id="addItem" class="invoice-btn primary" type="button">Add Service</button></div><div class="invoice-table-wrap"><table class="invoice-items"><thead><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Discount</th><th>Total</th><th></th></tr></thead><tbody id="items"></tbody></table></div><div class="invoice-summary"><div><span>Subtotal</span><strong id="subtotal">$0.00</strong></div><div><span>Discount</span><strong id="discountTotal">$0.00</strong></div><div class="grand"><span>Total</span><strong id="total">$0.00</strong></div></div></section><section class="invoice-card"><h2>Terms & Notes</h2><div class="invoice-grid"><label class="invoice-field"><span>Terms</span><textarea id="terms"></textarea></label><label class="invoice-field"><span>Notes</span><textarea id="notes"></textarea></label></div></section></div><div id="previewPane" hidden></div><div class="invoice-foot"><div><strong id="statusText">DRAFT</strong></div><div class="invoice-foot-actions"><button id="editBtn" class="invoice-btn" type="button" hidden>Edit</button><button id="viewBtn" class="invoice-btn" type="button" hidden>Preview</button><button id="downloadBtn" class="invoice-btn" type="button" hidden>Download PDF</button><button id="copyLink" class="invoice-btn" type="button" hidden>Copy Checkout Link</button><button id="sendInvoice" class="invoice-btn orange" type="button" hidden>Send Invoice</button><button id="markPaid" class="invoice-btn" type="button" hidden>Mark Paid</button><button id="voidInvoice" class="invoice-btn danger" type="button" hidden>Void</button><button id="save" class="invoice-btn primary" type="button">Save Invoice</button></div></div></div></section></main></div>
+                <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+                
+                
+                <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script><script src="assets/js/supabase-config.js"></script><script src="assets/js/core-auth.js"></script><script src="assets/js/ui.js?v=20260918-modal-fix-1"></script><script src="assets/js/session-security.js"></script><script src="assets/js/portal-auth-guard.js?v=20260918-auth-v16"></script><script src="assets/js/admin-auth-guard.js"></script><script src="assets/js/business-documents.js"></script><script src="assets/js/admin-invoice.js?v=20260918-auth-v16"></script><script src="assets/js/enterprise-portal.js?v=20260919-agency-v1"></script>
+</body></html>

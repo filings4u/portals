@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#24467f">
+
+<title>Course Manager | screenings4u Management Portal</title>
+<link href="images/fav.png" rel="icon" type="image/png"/>
+<link rel="stylesheet" href="assets/css/admin-lms.css"><link rel="stylesheet" href="assets/css/lms-ui-modals.css?v=20260917-brandmodal">
+<style>
+:root{--cm-blue:#24467f;--cm-orange:#ff6b00;--cm-text:#263246;--cm-muted:#6d7888;--cm-line:#dfe5ec;--cm-bg:#f5f7fa;--cm-ok:#18794e;--cm-warn:#c45100;--cm-bad:#b42318}
+*{box-sizing:border-box}.cm-page{padding:28px;background:var(--cm-bg);min-height:calc(100vh - 72px);color:var(--cm-text)}
+.cm-heading,.cm-panel-head,.cm-actions,.cm-status-row{display:flex;align-items:center}.cm-heading{justify-content:space-between;gap:22px;margin-bottom:18px}.cm-heading h1{margin:4px 0 6px;color:var(--cm-blue);font-size:36px;line-height:1.05}.cm-heading p,.cm-panel-head p{margin:0;color:var(--cm-muted);font-size:13px;line-height:1.55;max-width:780px}.cm-kicker{display:block;color:var(--cm-orange);font-size:10px;font-weight:900;letter-spacing:.12em}.cm-heading-actions,.cm-actions{display:flex;gap:8px;flex-wrap:wrap}
+.cm-btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 14px;border:1px solid #cfd7e2;border-radius:7px;background:#fff;color:var(--cm-blue);font:800 11px/1 Arial,sans-serif;text-decoration:none;cursor:pointer}.cm-btn.primary{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}.cm-btn.orange{background:var(--cm-orange);border-color:var(--cm-orange);color:#fff}.cm-btn:disabled{opacity:.45;cursor:not-allowed}
+.cm-selector{display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:10px;margin-bottom:18px;padding:14px 16px;background:#fff;border:1px solid var(--cm-line);border-radius:9px}.cm-selector select{height:40px;border:1px solid #d4dce6;border-radius:7px;background:#fff;padding:0 10px;color:var(--cm-text);font-size:11px}
+.cm-hero{background:#fff;border:1px solid var(--cm-line);border-radius:9px;padding:20px;margin-bottom:18px;box-shadow:0 2px 10px rgba(23,61,120,.035)}.cm-hero-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.cm-course-title{margin:5px 0 5px;color:var(--cm-blue);font-size:26px}.cm-course-copy{margin:0;color:var(--cm-muted);font-size:12px;line-height:1.55;max-width:770px}.cm-status-row{gap:9px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--cm-line)}.cm-status-label{color:var(--cm-muted);font-size:9px;font-weight:900;text-transform:uppercase}.cm-badge{display:inline-flex;align-items:center;min-height:23px;padding:0 8px;border-radius:999px;background:#eef4fb;color:var(--cm-blue);font-size:8px;font-weight:900;text-transform:uppercase}.cm-badge.published{background:#edf8f2;color:var(--cm-ok)}.cm-badge.draft{background:#fff6e8;color:var(--cm-warn)}.cm-badge.archived{background:#f1f3f5;color:#697586}
+.cm-tabs{display:flex;gap:4px;padding:5px;margin-bottom:18px;background:#fff;border:1px solid var(--cm-line);border-radius:8px;overflow:auto}.cm-tab{min-height:38px;padding:0 13px;border:0;border-radius:6px;background:transparent;color:var(--cm-muted);font-size:10px;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}.cm-tab.active,.cm-tab:hover{background:#eef4fb;color:var(--cm-blue)}
+.cm-grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px;align-items:start}.cm-panel{background:#fff;border:1px solid var(--cm-line);border-radius:9px;overflow:hidden;box-shadow:0 2px 10px rgba(23,61,120,.035)}.cm-panel-head{justify-content:space-between;gap:16px;padding:17px 18px;border-bottom:1px solid var(--cm-line)}.cm-panel-head h2{margin:3px 0 4px;color:var(--cm-blue);font-size:17px}.cm-outline{padding:14px}.cm-section{border:1px solid #e2e7ed;border-radius:8px;margin-bottom:12px;overflow:hidden}.cm-section-head{display:flex;align-items:center;gap:11px;padding:12px 13px;background:#fbfcfe;border-bottom:1px solid #edf0f4}.cm-section-num{width:29px;height:29px;border-radius:50%;background:#eef4fb;color:var(--cm-blue);display:grid;place-items:center;font-size:9px;font-weight:900;flex:0 0 auto}.cm-section-copy{flex:1;min-width:0}.cm-section-copy strong{display:block;color:var(--cm-blue);font-size:11px}.cm-section-copy small{display:block;margin-top:3px;color:var(--cm-muted);font-size:8px}.cm-lessons{padding:5px 13px 8px 48px}.cm-lesson{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #edf0f4}.cm-lesson:last-child{border-bottom:0}.cm-lesson-icon{width:28px;height:28px;border-radius:6px;background:#eef4fb;color:var(--cm-blue);display:grid;place-items:center;font-size:11px;font-weight:900}.cm-lesson-copy{flex:1;min-width:0}.cm-lesson-copy strong{display:block;color:var(--cm-text);font-size:10px}.cm-lesson-copy small{display:block;margin-top:3px;color:var(--cm-muted);font-size:8px}.cm-lesson a{color:var(--cm-blue);font-size:8px;font-weight:900;text-decoration:none}.cm-empty{padding:28px 18px;text-align:center;color:var(--cm-muted);font-size:10px;line-height:1.55}.cm-add-wrap{padding-top:3px}.cm-add-btn{width:100%;min-height:45px;border:1px dashed #9ab0cb;border-radius:7px;background:#f7faff;color:var(--cm-blue);font-size:10px;font-weight:900;cursor:pointer}
+.cm-side{display:grid;gap:18px}.cm-card-body{padding:15px 17px}.cm-summary-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #edf0f4}.cm-summary-row:last-child{border-bottom:0}.cm-summary-row span{color:var(--cm-muted);font-size:9px}.cm-summary-row strong{color:var(--cm-blue);font-size:10px}.cm-links{list-style:none;margin:0;padding:0}.cm-links li{border-bottom:1px solid #edf0f4}.cm-links li:last-child{border-bottom:0}.cm-links a{display:flex;justify-content:space-between;gap:12px;padding:11px 0;color:var(--cm-blue);font-size:10px;font-weight:900;text-decoration:none}.cm-links small{display:block;margin-top:3px;color:var(--cm-muted);font-size:8px;font-weight:500}.cm-links b{color:var(--cm-orange)}
+.cm-message{display:none;margin-bottom:14px;padding:10px 12px;border-radius:7px;font-size:10px;font-weight:800}.cm-message.show{display:block}.cm-message.ok{background:#edf8f2;border:1px solid #cce8d9;color:var(--cm-ok)}.cm-message.error{background:#fff5f5;border:1px solid #fed7d7;color:var(--cm-bad)}
+@media(max-width:1100px){.cm-grid{grid-template-columns:1fr}.cm-side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.cm-page{padding:18px}.cm-heading,.cm-hero-top,.cm-panel-head{flex-direction:column;align-items:stretch}.cm-heading h1{font-size:31px}.cm-selector{grid-template-columns:1fr}.cm-side{grid-template-columns:1fr}.cm-lessons{padding-left:13px}.cm-btn{width:100%}}
+</style>
+<link rel="stylesheet" href="assets/css/enterprise-portal.css?v=20260918-dashboard-v5">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand-system.css?v=20260918-dashboard-fix-v1">
+</head>
+<body class="admin-lms-course-manager-page">
+<div class="admin-lms-app">
+<div id="admin-lms-sidebar-target"></div>
+<main class="admin-lms-main">
+<header class="admin-lms-topbar">
+<div class="admin-lms-topbar-left">
+<button type="button" class="admin-lms-sidebar-collapse" data-admin-sidebar-collapse aria-label="Collapse sidebar" aria-expanded="true"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<div class="admin-lms-page-context"><small>Training</small><strong>Course Manager</strong></div>
+</div>
+<div class="admin-lms-topbar-right">
+<a href="admin-notifications.html" class="admin-lms-icon-button" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></a>
+<div class="admin-user-dropdown">
+<button type="button" class="admin-user-dropdown-toggle" data-admin-user-menu-toggle aria-expanded="false"><span class="admin-lms-avatar">AD</span><span class="admin-lms-user-copy"><span class="admin-lms-user-name">Administrator</span><span class="admin-lms-user-role">System Administrator</span></span><span class="admin-user-dropdown-chevron"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span></button>
+<div class="admin-user-dropdown-menu" data-admin-user-menu>
+<div class="admin-user-dropdown-header"><strong>Administrator</strong><span>System Administrator</span></div>
+<a href="index.html" class="admin-user-dropdown-item"><span>Visit Main Website</span></a>
+<a href="admin-accounts.html" class="admin-user-dropdown-item"><span>Account Access</span></a>
+<a href="admin-accounts.html" class="admin-user-dropdown-item"><span>My Account</span></a>
+<div class="admin-user-dropdown-divider"></div>
+<button type="button" class="admin-user-dropdown-item admin-user-logout" data-admin-logout><span>Logout</span></button>
+</div></div></div>
+</header>
+
+<section class="cm-page">
+<header class="cm-heading">
+<div><span class="cm-kicker">LEARNING CONTENT</span><h1>Course Manager</h1><p>Manage an individual course, review its structure, and move directly into sections, lessons, enrollments, progress, and course settings.</p></div>
+<div class="cm-heading-actions"><a class="cm-btn" href="admin-lms-courses.html">All Courses</a><a class="cm-btn orange" href="admin-lms-course-builder.html">+ Create Course</a></div>
+</header>
+
+<div class="cm-message" id="cmMessage"></div>
+
+<section class="cm-selector">
+<select id="cmCourseSelect"><option value="">Select a course to manage</option></select>
+<button class="cm-btn primary" id="cmOpenCourse" type="button">Open Course</button>
+</section>
+
+<section class="cm-hero">
+<div class="cm-hero-top">
+<div><span class="cm-kicker">INDIVIDUAL COURSE WORKSPACE</span><h2 class="cm-course-title" id="cmCourseTitle">Select a Course to Manage</h2><p class="cm-course-copy" id="cmCourseDescription">Choose a course above to load its sections, lessons, enrollment totals, completion information, and course settings.</p></div>
+<div class="cm-actions"><a class="cm-btn" id="cmEditCourse" href="admin-lms-course-builder.html">Edit Course</a><button class="cm-btn primary" id="cmPublish" type="button" disabled>Publish Course</button></div>
+</div>
+<div class="cm-status-row"><span class="cm-status-label">Course Status</span><span class="cm-badge" id="cmStatus">No Course Selected</span><span class="cm-status-label">Last Updated</span><strong id="cmUpdated" style="font-size:10px;color:var(--cm-blue)">—</strong></div>
+</section>
+
+<nav class="cm-tabs" aria-label="Course manager sections">
+<a class="cm-tab active" href="#">Course Content</a>
+<a class="cm-tab" id="cmEnrollmentsTab" href="admin-lms-enrollments.html">Enrollments</a>
+<a class="cm-tab" id="cmProgressTab" href="admin-lms-progress.html">Progress</a>
+<a class="cm-tab" id="cmCertificatesTab" href="admin-lms-certificates.html">Certificates</a>
+<a class="cm-tab" id="cmSettingsTab" href="admin-lms-course-builder.html">Course Settings</a>
+</nav>
+
+<div class="cm-grid">
+<div>
+<section class="cm-panel">
+<header class="cm-panel-head">
+<div><span class="cm-kicker">COURSE STRUCTURE</span><h2>Sections & Lessons</h2><p>Live course hierarchy from <strong>lms_sections</strong> and <strong>lms_lessons</strong>.</p></div>
+<div class="cm-actions"><a class="cm-btn" id="cmManageLessons" href="admin-lms-lesson-builder.html">Lesson Builder</a><a class="cm-btn primary" id="cmAddSection" href="admin-lms-course-builder.html">Add Section</a></div>
+</header>
+<div class="cm-outline" id="cmOutline"><div class="cm-empty">Select a course to load its sections and lessons.</div></div>
+</section>
+</div>
+
+<aside class="cm-side">
+<section class="cm-panel">
+<header class="cm-panel-head"><div><span class="cm-kicker">SUMMARY</span><h2>Course Summary</h2></div></header>
+<div class="cm-card-body">
+<div class="cm-summary-row"><span>Sections</span><strong id="cmSummarySections">—</strong></div>
+<div class="cm-summary-row"><span>Lessons</span><strong id="cmSummaryLessons">—</strong></div>
+<div class="cm-summary-row"><span>Enrollments</span><strong id="cmSummaryEnrollments">—</strong></div>
+<div class="cm-summary-row"><span>Completed</span><strong id="cmSummaryCompleted">—</strong></div>
+<div class="cm-summary-row"><span>Completion Rate</span><strong id="cmSummaryRate">—</strong></div>
+</div>
+</section>
+
+<section class="cm-panel">
+<header class="cm-panel-head"><div><span class="cm-kicker">SHORTCUTS</span><h2>Course Management</h2></div></header>
+<div class="cm-card-body"><ul class="cm-links">
+<li><a id="cmQuickLessons" href="admin-lms-lesson-builder.html"><span>Lessons<small>Manage course lessons and content.</small></span><b>→</b></a></li>
+<li><a id="cmQuickEnrollments" href="admin-lms-enrollments.html"><span>Enrollments<small>View learners and course access.</small></span><b>→</b></a></li>
+<li><a id="cmQuickProgress" href="admin-lms-progress.html"><span>Learning Progress<small>Review learner completion activity.</small></span><b>→</b></a></li>
+<li><a id="cmQuickCertificates" href="admin-lms-certificates.html"><span>Certificates<small>Review issued completion records.</small></span><b>→</b></a></li>
+</ul></div>
+</section>
+
+<section class="cm-panel">
+<header class="cm-panel-head"><div><span class="cm-kicker">COURSE ACTIONS</span><h2>Administrative Actions</h2></div></header>
+<div class="cm-card-body" style="display:grid;gap:8px"><button class="cm-btn" id="cmArchive" type="button" disabled>Archive Course</button></div>
+</section>
+</aside>
+</div>
+</section>
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/core-auth.js"></script>
+<script src="assets/js/ui.js?v=20260918-modal-fix-1"></script>
+<script src="assets/js/session-security.js"></script>
+<script src="assets/js/portal-auth-guard.js?v=20260918-auth-v16"></script>
+<script src="assets/js/admin-auth-guard.js"></script>
+<script src="assets/js/admin-lms-course-manager.js?v=20260917-v13"></script>
+<script src="assets/js/enterprise-portal.js?v=20260919-agency-v1"></script>
+</body>
+</html>

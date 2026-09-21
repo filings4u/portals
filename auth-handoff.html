@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#24467f"><title>Connecting Portal | screenings4u</title>
+<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#17304f}.card{width:min(92vw,460px);padding:34px;background:#fff;border:1px solid #dce4ee;border-radius:16px;box-shadow:0 18px 45px rgba(23,61,120,.1);text-align:center}.logo{width:220px;max-width:75%;margin:0 auto 24px}.spin{width:34px;height:34px;margin:20px auto;border:3px solid #dce4ee;border-top-color:#ff6b00;border-radius:50%;animation:s .8s linear infinite}@keyframes s{to{transform:rotate(360deg)}}h1{font-size:24px;margin:0 0 8px;color:#24467f}p{font-size:13px;line-height:1.6;color:#68778c;margin:0}.error{color:#b42318}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/brand-system.css?v=20260918-brand-repair-v2">
+</head><body><main class="card"><img class="logo" src="images/logo2.png" alt="screenings4u"><h1>Connecting your portal</h1><p id="message">Verifying your secure C/TPA access…</p><div class="spin" id="spinner"></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async()=>{
+ const message=document.getElementById('message'),spinner=document.getElementById('spinner');
+ const q=new URLSearchParams(location.search),surface=(q.get('surface')||'').toLowerCase(),next=q.get('next')||'/ctpa/dashboard.html';
+ const safeNext=next.startsWith('/')&&!next.startsWith('//')?next:'/ctpa/dashboard.html';
+ try{
+   if(!['workforce','dot'].includes(surface))throw new Error('Portal destination is invalid.');
+   const client=window.supabase.createClient('https://wyezpseboxbmkedvbmyx.supabase.co','sb_publishable__BLewZS6h2V4yUczky-BTQ_EemiOdDL',{auth:{persistSession:true,detectSessionInUrl:true,autoRefreshToken:true}});
+   let session=null;
+   for(let i=0;i<30;i++){
+     const r=await client.auth.getSession();session=r.data?.session||null;if(session)break;await new Promise(x=>setTimeout(x,100));
+   }
+   if(!session)throw new Error('The secure handoff could not establish your session.');
+   const c=await client.functions.invoke('workforce-session-context',{body:{requested_portal:'ctpa',requested_surface:surface}});
+   if(c.error)throw c.error;if(!c.data?.has_access)throw new Error('This C/TPA account is not authorized for this portal.');
+   if(c.data?.membership?.id)sessionStorage.setItem('s4u_workspace_membership',c.data.membership.id);
+   history.replaceState(null,'',location.pathname);
+   location.replace(safeNext);
+ }catch(e){spinner.hidden=true;message.className='error';message.textContent=e?.message||'Unable to complete the portal handoff. Please sign in again.';}
+})();
+</script></body></html>
