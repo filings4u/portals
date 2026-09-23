@@ -28,7 +28,7 @@ const ICONS={
 const modules={
  testing:{label:'Testing',landing:'admin-testing-orders.html',product:'screenings4u',groups:[
   ['Testing Operations',[
-   ['admin-testing-orders.html','Testing Orders'],['admin-testing-cases.html','Testing Cases'],['admin-testing-schedule.html','Scheduling'],['admin-testing-results.html','Results'],['admin-testing-providers.html','Providers'],['admin-testing-customers.html','Customers']]],
+   ['admin-testing-orders.html','Testing Orders'],['admin-testing-cases.html','Testing Cases'],['admin-testing-schedule.html','Scheduling'],['admin-testing-results.html','Results'],['admin-testing-providers.html','Providers'],['admin-testing-customers.html','Testing Customers & Portal']]],
   ['Service Management',[
    ['admin-testing-services.html','Service Catalog'],['admin-testing-background.html','Background Checks'],['admin-testing-mobile.html','Mobile & Onsite Testing'],['admin-testing-post-accident.html','Post-Accident Testing'],['admin-testing-court-orders.html','Court-Ordered Testing'],['admin-testing-documents.html','Documents'],['admin-testing-reports.html','Reports']]]]},
  training:{label:'Training',landing:'admin-lms-courses.html',product:'training',groups:[
