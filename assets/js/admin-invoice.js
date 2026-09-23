@@ -52,6 +52,7 @@
 
   async function init(){
     cache();bind();
+    if(E.amountPaid){E.amountPaid.readOnly=true;E.amountPaid.title="Payments are recorded through Mark Paid or Stripe.";}
     try{
       db=await client();if(!db)throw Error("Supabase client not found.");
       await waitForAdminAuth();
