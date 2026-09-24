@@ -15,7 +15,7 @@ const badge=v=>`<span class="ecp-badge">${esc(String(v??'—').replaceAll('_',' 
 const field=(name,label,value='',type='text',extra={})=>({name,label,value:value??'',type,...extra});
 const opts=(rows,value,label,first='Choose')=>[{value:'',label:first},...rows.map(x=>({value:value(x),label:label(x)}))];
 function modal(o){if(!window.S4UUI?.formModal)throw new Error('Branded form system is unavailable.');return window.S4UUI.formModal(o)}
-async function confirmBox(title,message,confirmText='Continue'){if(window.S4UUI?.confirm)return window.S4UUI.confirm(message,{title,type:'warning',confirmText,cancelText:'Cancel'});return false}
+async function confirmBox(title,message,confirmText='Continue'){return window.S4UConfirm?window.S4UConfirm(message,{title,confirmText}):false}
 function config(){return detail?.configuration||{}}
 function employerLabel(id){const x=(config().employers||[]).find(v=>String(v.id)===String(id));return x?.legal_name||x?.organizations?.legal_name||id||'—'}
 function employeeLabel(id){const x=(config().employees||[]).find(v=>String(v.id)===String(id));return x?[x.first_name,x.last_name].filter(Boolean).join(' ')||x.employee_number||id:id||'—'}
