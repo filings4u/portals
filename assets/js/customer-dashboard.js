@@ -89,6 +89,7 @@
   function render() {
     renderWelcome();
     renderPortalAccount();
+    renderUnifiedPortalAccess();
     renderStats();
     renderOrders();
     renderResults();
@@ -120,6 +121,56 @@
       name: fullName,
       email: S.user?.email || ""
     });
+  }
+
+
+  function hasDotCtpaAccess() {
+    return S.orders.some((o) =>
+      (o.order_items || []).some((i) =>
+        String(i?.metadata?.service_sku || '').toLowerCase() === 'lab-account' ||
+        String(i?.metadata?.workforce_dot_plan_code || '').toLowerCase().includes('dot_ctpa')
+      )
+    );
+  }
+
+  function renderUnifiedPortalAccess() {
+    if (!hasDotCtpaAccess()) return;
+    const actions = document.querySelector('.customer-welcome-actions');
+    if (!actions || document.getElementById('customer-dot-ctpa-sso')) return;
+    const link = document.createElement('a');
+    link.href = '#';
+    link.id = 'customer-dot-ctpa-sso';
+    link.className = 'customer-primary-action';
+    link.innerHTML = 'Open C/TPA DOT Portal';
+    link.addEventListener('click', openDotCtpaPortal);
+    actions.appendChild(link);
+  }
+
+  async function openDotCtpaPortal(event) {
+    event?.preventDefault?.();
+    const link = event?.currentTarget;
+    const original = link?.textContent || 'Open C/TPA DOT Portal';
+    try {
+      if (link) { link.textContent = 'Opening DOT Portal…'; link.setAttribute('aria-disabled','true'); }
+      const { data: { session } } = await S.db.auth.getSession();
+      if (!session?.access_token) throw new Error('Your screenings4u session has expired. Please sign in again.');
+      const r = await fetch('https://wyezpseboxbmkedvbmyx.supabase.co/functions/v1/workforce-internal-gateway', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ action: 'customer_sso_handoff', product_code: 'dot', portal_code: 'ctpa_dot' })
+      });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok || body?.error || !body?.handoff_url) throw new Error(body?.error || 'Unable to open the DOT C/TPA portal.');
+      window.location.href = body.handoff_url;
+    } catch (e) {
+      console.error('[Customer Dashboard] DOT SSO', e);
+      if (window.S4UUI?.alert) window.S4UUI.alert(e.message || 'Unable to open the DOT portal.', { title: 'Portal Access' });
+      else alert(e.message || 'Unable to open the DOT portal.');
+      if (link) { link.textContent = original; link.removeAttribute('aria-disabled'); }
+    }
   }
 
   function displayFullName() {

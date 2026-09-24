@@ -251,22 +251,35 @@
     );
   }
 
-  async function verifyAdminAccess(userRoles = []) {
-    if (userCanAccessPortal(userRoles, "admin")) {
-      return true;
-    }
-
+  async function verifyAdminAccess() {
     const client = getClient();
-    const { data, error } =
-      await client.rpc("is_admin");
 
-    if (error) {
+    /*
+     * Phase 6 hardening: legacy portal roles are no longer sufficient
+     * for Administrator Portal entry. The server must confirm an active
+     * internal staff profile and at least one active staff role.
+     */
+    const { data, error } = await client.functions.invoke(
+      "screenings4u-staff-context",
+      { body: { action: "context" } }
+    );
+
+    if (error || data?.error) {
+      const message = data?.error || error?.message ||
+        "Active internal staff access is required.";
+      if (/active screenings4u staff access|required/i.test(message)) {
+        return false;
+      }
       throw new Error(
-        `Unable to verify administrator access: ${error.message}`
+        `Unable to verify administrator access: ${message}`
       );
     }
 
-    return data === true;
+    return Boolean(
+      data?.profile?.employment_status === "active" &&
+      Array.isArray(data?.role_codes) &&
+      data.role_codes.length
+    );
   }
 
   async function verifyTrainingAccess() {
