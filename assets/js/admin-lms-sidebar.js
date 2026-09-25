@@ -73,17 +73,17 @@ bindUserDropdown();
       items: [
         {
           label: "Employers",
-          href: "admin-employers.html",
+          href: "admin-organizations.html?business=testing&type=employer",
           icon: "building"
         },
         {
           label: "Employer Users",
-          href: "admin-employer-users.html",
+          href: "admin-access.html?business=testing",
           icon: "users"
         },
         {
           label: "Employees",
-          href: "admin-employees.html",
+          href: "admin-people.html?business=testing",
           icon: "employee"
         }
       ]

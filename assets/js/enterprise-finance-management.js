@@ -4,7 +4,7 @@
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>[...r.querySelectorAll(s)];
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const API='https://rgsrubdtljyxmnihwlah.supabase.co/functions/v1/screenings4u-finance-management';
+  const API='https://elpbnytpciqnbexiaebp.supabase.co/functions/v1/screenings4u-finance-management';
   const KEY=window.SCREENINGS4U_SUPABASE_ANON_KEY||'';
   const page=(location.pathname.split('/').pop()||'').toLowerCase();
   const cfg={

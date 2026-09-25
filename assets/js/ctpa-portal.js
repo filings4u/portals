@@ -129,7 +129,8 @@ async function loadSurfaceContext(){
 async function switchBusinessSurface(target){
   target=String(target||'').toLowerCase();
   if(!['workforce','dot'].includes(target)||target===currentSurface())return;
-  const {data,error}=await supabase.functions.invoke('workforce-portal-handoff',{body:{surface:target,next:'/ctpa/'+(location.pathname.split('/').pop()||'dashboard.html')}});
+  const portalCode=target==='dot'?'ctpa_dot':'ctpa_workforce';
+  const {data,error}=await supabase.functions.invoke('portal-session-handoff',{body:{action:'create',surface:target,portal_code:portalCode,next:'/ctpa/'+(location.pathname.split('/').pop()||'dashboard.html')}});
   if(error){let m=error.message;try{m=(await error.context?.clone?.().json())?.error||m}catch{}throw new Error(m||'Unable to switch portals.')}
   if(!data?.redirect_url)throw new Error(data?.error||'Unable to create portal handoff.');
   location.assign(data.redirect_url);

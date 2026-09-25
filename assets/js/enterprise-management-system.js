@@ -1,11 +1,11 @@
 (()=>{'use strict';
 const qs=(s,r=document)=>r.querySelector(s), qsa=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const FONT_KEY='s4u-enterprise-font-scale',FONT_STEPS=[.82,.92,1,1.1,1.2];
-function fontValue(){const v=Number(localStorage.getItem(FONT_KEY));return FONT_STEPS.includes(v)?v:.92}
-function applyFont(v){document.documentElement.style.setProperty('--s4u-font-scale',String(v));localStorage.setItem(FONT_KEY,String(v));qsa('.s4u-font-sizer button').forEach(b=>b.classList.toggle('active',Number(b.dataset.scale)===v))}
+const FONT_KEY='s4u-enterprise-font-scale-v2',FONT_STEPS=[.85,.92,1];
+function fontValue(){try{const v=Number(localStorage.getItem(FONT_KEY));return FONT_STEPS.includes(v)?v:.92}catch{return .92}}
+function applyFont(v){v=FONT_STEPS.includes(Number(v))?Number(v):.92;document.documentElement.style.setProperty('--s4u-font-scale',String(v));document.documentElement.style.setProperty('--ep-font-scale',String(v));document.documentElement.dataset.fontScale=String(v);qsa('.s4u-font-sizer button').forEach(b=>{const active=Number(b.dataset.scale)===v;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active?'true':'false')});try{localStorage.setItem(FONT_KEY,String(v))}catch{}}
 function bindFontSizer(wrap){if(!wrap||wrap.dataset.fontSizerBound==='1')return;wrap.dataset.fontSizerBound='1';wrap.addEventListener('click',e=>{const b=e.target.closest('button[data-scale]');if(b)applyFont(Number(b.dataset.scale))})}
-function addFontSizer(){let wrap=qs('.s4u-font-sizer');if(wrap){bindFontSizer(wrap);applyFont(fontValue());return}const host=qs('.ep-top-actions');if(!host)return;wrap=document.createElement('div');wrap.className='s4u-font-sizer';wrap.setAttribute('aria-label','Portal font size');wrap.innerHTML='<span>Text</span>'+FONT_STEPS.map((v,i)=>`<button type="button" data-scale="${v}" title="${i<2?'Smaller':i===2?'Default':'Larger'} text">${i===0?'A−':i===1?'A':i===2?'A':i===3?'A+':'A++'}</button>`).join('');bindFontSizer(wrap);host.insertBefore(wrap,host.querySelector('.ep-user-menu')||null);applyFont(fontValue())}
+function addFontSizer(){let wrap=qs('.s4u-font-sizer');if(wrap){bindFontSizer(wrap);if(wrap.dataset.fontSizerInitialized!=='1'){wrap.dataset.fontSizerInitialized='1';applyFont(fontValue())}return wrap}const host=qs('.ep-top-actions');if(!host)return null;wrap=document.createElement('div');wrap.className='s4u-font-sizer';wrap.setAttribute('aria-label','Portal font size');wrap.innerHTML='<span>Text</span>'+FONT_STEPS.map((v,i)=>`<button type="button" data-scale="${v}" aria-pressed="false" title="${i===0?'Smaller':i===1?'Default':'Larger'} text">${i===0?'A−':i===1?'A':'A+'}</button>`).join('');bindFontSizer(wrap);wrap.dataset.fontSizerInitialized='1';host.insertBefore(wrap,host.querySelector('.ep-user-menu')||null);applyFont(fontValue());return wrap}
 function stack(){let s=qs('.s4u-toast-stack');if(!s){s=document.createElement('div');s.className='s4u-toast-stack';s.setAttribute('aria-live','polite');document.body.appendChild(s)}return s}
 function notify(message,type='info',title=''){if(!message)return;const t=document.createElement('div');t.className=`s4u-toast ${type}`;const heading=title||(type==='success'?'Success':type==='error'?'Action needed':type==='warning'?'Please review':'screenings4u Enterprise');t.innerHTML=`<div class="s4u-toast-copy"><strong>${esc(heading)}</strong><p>${esc(message)}</p></div><button class="s4u-toast-close" type="button" aria-label="Dismiss">×</button>`;const remove=()=>{t.classList.add('leaving');setTimeout(()=>t.remove(),190)};t.querySelector('button').onclick=remove;stack().appendChild(t);setTimeout(remove,type==='error'?9000:5500)}
 window.S4UNotify={show:notify,success:m=>notify(m,'success'),error:m=>notify(m,'error'),warning:m=>notify(m,'warning')};
@@ -48,6 +48,7 @@ function observe(){
   qsa('.ecp-alert').forEach(alertToToast);
   qsa('.ecp-route-panel.open,.modal.open,.modal.show,[class*="-modal"][aria-hidden="false"],[role="dialog"][aria-hidden="false"],[aria-modal="true"][aria-hidden="false"]').forEach(routeModal);
 }
+window.S4UFontSizer={refresh:addFontSizer,set:applyFont,get:fontValue};applyFont(fontValue());
 function wire(){applyFont(fontValue());addFontSizer();patchInvoke();observe();const timer=setInterval(()=>{addFontSizer();if(patchInvoke())clearInterval(timer)},300);setTimeout(()=>clearInterval(timer),10000)}
 window.addEventListener('popstate',()=>{if(routed)closeRoute()});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();

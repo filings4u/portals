@@ -7,3 +7,316 @@ html,body{font-size:var(--s4u-font-body)}body,.admin-lms-main,.ecp-page{font-siz
 @media(max-width:900px){.ecp-page{padding:16px}.s4u-toast-stack{top:62px;right:10px}.s4u-font-sizer span{display:none}.s4u-font-sizer button{width:25px;height:25px}.s4u-route-head{padding:15px}.s4u-route-body{padding:15px}}
 
 .ecp-route-panel{display:none!important}
+
+/* ================================================================
+   ENTERPRISE PORTAL DESIGN SYSTEM v5 — dashboard visual language
+   Shared across every live management workspace.
+   ================================================================ */
+:root{
+  --s4u-font-scale:1;
+  --ep-font-scale:var(--s4u-font-scale);
+  --s4u-surface:#ffffff;
+  --s4u-canvas:#f5f8fc;
+  --s4u-line:#dbe5f0;
+  --s4u-line-soft:#edf2f7;
+  --s4u-ink:#10264a;
+  --s4u-copy:#435a76;
+  --s4u-muted:#71839d;
+  --s4u-navy:#0b2a50;
+  --s4u-blue:#24467f;
+  --s4u-orange:#ff6b00;
+  --s4u-radius:11px;
+  --s4u-shadow:0 8px 28px rgba(20,54,92,.07);
+}
+html{font-size:calc(16px * var(--s4u-font-scale))!important}
+body.ep-enterprise-shell,
+body.ep-enterprise-shell button,
+body.ep-enterprise-shell input,
+body.ep-enterprise-shell select,
+body.ep-enterprise-shell textarea{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important}
+body.ep-enterprise-shell{background:var(--s4u-canvas)!important;color:var(--s4u-ink)!important}
+
+/* One page canvas, regardless of which phase originally created the page. */
+body.ep-enterprise-shell .admin-lms-main>section:not(.ep-dashboard),
+body.ep-enterprise-shell .admin-lms-main>.page,
+body.ep-enterprise-shell .admin-lms-main>.admin-lms-content,
+body.ep-enterprise-shell .admin-lms-main>.ep-business-page,
+body.ep-enterprise-shell .admin-lms-main>.ep-page,
+body.ep-enterprise-shell .admin-lms-main>.et-page,
+body.ep-enterprise-shell .admin-lms-main>.se-page,
+body.ep-enterprise-shell .admin-lms-main>.comm-page,
+body.ep-enterprise-shell .admin-lms-main>.lb-page,
+body.ep-enterprise-shell .admin-lms-main>.invoice-page,
+body.ep-enterprise-shell .admin-lms-main>.courses-page,
+body.ep-enterprise-shell .admin-lms-main>.media-page{
+  width:100%!important;
+  max-width:1580px!important;
+  margin:0 auto!important;
+  padding:20px 24px 34px!important;
+  background:var(--s4u-canvas)!important;
+  color:var(--s4u-ink)!important;
+}
+
+/* Page titles and descriptive copy match the dashboard scale. */
+body.ep-enterprise-shell .ecp-head,
+body.ep-enterprise-shell .courses-heading,
+body.ep-enterprise-shell .ep-business-head,
+body.ep-enterprise-shell .page-head,
+body.ep-enterprise-shell .settings-heading,
+body.ep-enterprise-shell .admin-page-head{
+  margin-bottom:16px!important;
+  gap:14px!important;
+}
+body.ep-enterprise-shell .ecp-head h1,
+body.ep-enterprise-shell .courses-heading h1,
+body.ep-enterprise-shell .ep-business-head h1,
+body.ep-enterprise-shell .page-head h1,
+body.ep-enterprise-shell .settings-heading h1,
+body.ep-enterprise-shell .admin-page-head h1,
+body.ep-enterprise-shell .admin-lms-content h1{
+  margin:0!important;
+  color:var(--s4u-ink)!important;
+  font-size:1.62rem!important;
+  line-height:1.08!important;
+  letter-spacing:-.035em!important;
+  font-weight:850!important;
+}
+body.ep-enterprise-shell .ecp-head p,
+body.ep-enterprise-shell .courses-heading p,
+body.ep-enterprise-shell .ep-business-head p,
+body.ep-enterprise-shell .page-head p,
+body.ep-enterprise-shell .settings-heading p,
+body.ep-enterprise-shell .admin-page-head p{
+  margin:5px 0 0!important;
+  color:var(--s4u-muted)!important;
+  font-size:.78rem!important;
+  line-height:1.48!important;
+  max-width:850px!important;
+}
+body.ep-enterprise-shell .courses-kicker,
+body.ep-enterprise-shell .ep-eyebrow,
+body.ep-enterprise-shell .kicker,
+body.ep-enterprise-shell [class*="-kicker"]{
+  color:var(--s4u-orange)!important;
+  font-size:.59rem!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+  letter-spacing:.13em!important;
+  text-transform:uppercase!important;
+}
+
+/* Common cards/panels use the same surface treatment as the dashboard. */
+body.ep-enterprise-shell .ecp-card,
+body.ep-enterprise-shell .card,
+body.ep-enterprise-shell .panel,
+body.ep-enterprise-shell .settings-card,
+body.ep-enterprise-shell .courses-panel,
+body.ep-enterprise-shell .courses-metric,
+body.ep-enterprise-shell .courses-action-card,
+body.ep-enterprise-shell .stat-card,
+body.ep-enterprise-shell .finance-entity,
+body.ep-enterprise-shell .ep-business-card,
+body.ep-enterprise-shell .lb-card,
+body.ep-enterprise-shell .media-card,
+body.ep-enterprise-shell .assessment-card{
+  background:var(--s4u-surface)!important;
+  border:1px solid var(--s4u-line)!important;
+  border-radius:var(--s4u-radius)!important;
+  box-shadow:var(--s4u-shadow)!important;
+}
+body.ep-enterprise-shell .ecp-card{margin-bottom:14px!important}
+body.ep-enterprise-shell .ecp-card-head,
+body.ep-enterprise-shell .courses-panel-head,
+body.ep-enterprise-shell .lb-card-head{
+  padding:14px 16px!important;
+  border-bottom:1px solid var(--s4u-line-soft)!important;
+}
+body.ep-enterprise-shell .ecp-card-head h2,
+body.ep-enterprise-shell .courses-panel-head h2,
+body.ep-enterprise-shell .lb-card-head h2,
+body.ep-enterprise-shell .card h2,
+body.ep-enterprise-shell .panel h2{
+  margin:0!important;
+  color:var(--s4u-ink)!important;
+  font-size:.96rem!important;
+  letter-spacing:-.015em!important;
+}
+body.ep-enterprise-shell .ecp-card-body{padding:16px!important}
+
+/* Metrics are intentionally compact and consistent. */
+body.ep-enterprise-shell .ecp-metrics,
+body.ep-enterprise-shell .courses-metrics,
+body.ep-enterprise-shell .finance-metrics{
+  gap:10px!important;
+  margin-bottom:14px!important;
+}
+body.ep-enterprise-shell .ecp-metric,
+body.ep-enterprise-shell .courses-metric,
+body.ep-enterprise-shell .stat-card,
+body.ep-enterprise-shell [class*="-metric"]{
+  border-radius:10px!important;
+}
+body.ep-enterprise-shell .ecp-metric{padding:13px 14px!important}
+body.ep-enterprise-shell .ecp-metric span,
+body.ep-enterprise-shell .courses-metric span,
+body.ep-enterprise-shell .stat-card span{
+  color:var(--s4u-muted)!important;
+  font-size:.62rem!important;
+  letter-spacing:.02em!important;
+}
+body.ep-enterprise-shell .ecp-metric strong,
+body.ep-enterprise-shell .courses-metric strong,
+body.ep-enterprise-shell .stat-card strong{
+  color:#0d2d55!important;
+  font-size:1.48rem!important;
+  line-height:1!important;
+  letter-spacing:-.035em!important;
+}
+
+/* Forms and filter bars. */
+body.ep-enterprise-shell .ecp-filter-grid{gap:10px!important}
+body.ep-enterprise-shell .ecp-field label,
+body.ep-enterprise-shell .field label,
+body.ep-enterprise-shell label.label{
+  color:#526985!important;
+  font-size:.64rem!important;
+  font-weight:800!important;
+  margin-bottom:5px!important;
+}
+body.ep-enterprise-shell input:not([type="checkbox"]):not([type="radio"]),
+body.ep-enterprise-shell select,
+body.ep-enterprise-shell textarea{
+  color:#253d5d!important;
+  font-size:.75rem!important;
+  border-color:#d3deeb!important;
+  border-radius:8px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+}
+body.ep-enterprise-shell input:not([type="checkbox"]):not([type="radio"]),
+body.ep-enterprise-shell select{min-height:38px!important}
+body.ep-enterprise-shell textarea{line-height:1.45!important}
+body.ep-enterprise-shell input:focus,
+body.ep-enterprise-shell select:focus,
+body.ep-enterprise-shell textarea:focus{
+  outline:none!important;
+  border-color:#9bb2cc!important;
+  box-shadow:0 0 0 3px rgba(36,70,127,.07)!important;
+}
+
+/* Buttons use one sizing system across every management module. */
+body.ep-enterprise-shell .ecp-btn,
+body.ep-enterprise-shell .btn,
+body.ep-enterprise-shell .courses-btn,
+body.ep-enterprise-shell .course-row-btn,
+body.ep-enterprise-shell .admin-primary-btn,
+body.ep-enterprise-shell .invoice-btn,
+body.ep-enterprise-shell .quiz-builder-button,
+body.ep-enterprise-shell .assessment-button,
+body.ep-enterprise-shell .blog-button,
+body.ep-enterprise-shell .lb-btn,
+body.ep-enterprise-shell .preview-btn,
+body.ep-enterprise-shell .participants-pill-button,
+body.ep-enterprise-shell .row-action{
+  min-height:35px!important;
+  border-radius:8px!important;
+  font-size:.69rem!important;
+  line-height:1!important;
+  font-weight:800!important;
+  padding:0 11px!important;
+  font-family:inherit!important;
+}
+body.ep-enterprise-shell .ecp-btn.primary,
+body.ep-enterprise-shell .btn.primary,
+body.ep-enterprise-shell .courses-btn.primary,
+body.ep-enterprise-shell .admin-primary-btn,
+body.ep-enterprise-shell .invoice-btn.primary{
+  background:var(--s4u-blue)!important;
+  border-color:var(--s4u-blue)!important;
+  color:#fff!important;
+}
+
+/* Tables mirror the clean dashboard density. */
+body.ep-enterprise-shell table{border-collapse:collapse!important}
+body.ep-enterprise-shell table th{
+  color:#62758f!important;
+  background:#f7f9fc!important;
+  font-size:.61rem!important;
+  line-height:1.25!important;
+  font-weight:850!important;
+  letter-spacing:.045em!important;
+  text-transform:uppercase!important;
+  padding:10px 11px!important;
+  border-bottom:1px solid var(--s4u-line)!important;
+}
+body.ep-enterprise-shell table td{
+  color:#29405f!important;
+  font-size:.71rem!important;
+  line-height:1.38!important;
+  padding:11px!important;
+  border-bottom:1px solid var(--s4u-line-soft)!important;
+}
+body.ep-enterprise-shell table tbody tr:hover td{background:#fbfdff!important}
+body.ep-enterprise-shell .ecp-name,
+body.ep-enterprise-shell .course-name strong{color:#17365e!important;font-size:.72rem!important}
+body.ep-enterprise-shell .ecp-sub,
+body.ep-enterprise-shell .course-name small{color:#7b8ba0!important;font-size:.62rem!important}
+
+/* Tabs, badges and chips. */
+body.ep-enterprise-shell .ecp-tabs{gap:5px!important;margin-bottom:14px!important}
+body.ep-enterprise-shell .ecp-tabs a,
+body.ep-enterprise-shell .ecp-ops-tabs button{
+  min-height:34px!important;
+  padding:0 10px!important;
+  border-radius:8px!important;
+  font-size:.68rem!important;
+}
+body.ep-enterprise-shell .ecp-badge,
+body.ep-enterprise-shell .course-badge,
+body.ep-enterprise-shell [class*="-pill"]{
+  font-size:.58rem!important;
+  line-height:1!important;
+}
+
+/* Shared font-size control: obvious three-step control, persistent portal-wide. */
+.s4u-font-sizer{gap:2px!important;padding:3px!important;border-color:#d9e3ee!important;background:#f8fafc!important}
+.s4u-font-sizer span{font-size:.58rem!important;padding:0 5px!important;color:#60738d!important}
+.s4u-font-sizer button{
+  width:29px!important;
+  height:28px!important;
+  border-radius:6px!important;
+  font-size:.69rem!important;
+  transition:background .12s,color .12s,box-shadow .12s!important;
+}
+.s4u-font-sizer button.active,
+.s4u-font-sizer button[aria-pressed="true"]{
+  background:var(--s4u-blue)!important;
+  color:#fff!important;
+  box-shadow:0 2px 7px rgba(36,70,127,.18)!important;
+}
+
+/* Management actions stay as routed pages, never visual overlay modals. */
+body.ep-enterprise-shell .s4u-management-route,
+body.ep-enterprise-shell .s4u-confirm-route{
+  border-radius:var(--s4u-radius)!important;
+  box-shadow:var(--s4u-shadow)!important;
+}
+body.ep-enterprise-shell .s4u-route-head{padding:16px 18px!important}
+body.ep-enterprise-shell .s4u-route-head h1,
+body.ep-enterprise-shell .s4u-route-head h2{font-size:1.18rem!important;color:var(--s4u-ink)!important}
+body.ep-enterprise-shell .s4u-route-body{padding:18px!important}
+
+@media(max-width:900px){
+  body.ep-enterprise-shell .admin-lms-main>section:not(.ep-dashboard),
+  body.ep-enterprise-shell .admin-lms-main>.page,
+  body.ep-enterprise-shell .admin-lms-main>.admin-lms-content,
+  body.ep-enterprise-shell .admin-lms-main>.ep-business-page,
+  body.ep-enterprise-shell .admin-lms-main>.ep-page,
+  body.ep-enterprise-shell .admin-lms-main>.et-page,
+  body.ep-enterprise-shell .admin-lms-main>.se-page,
+  body.ep-enterprise-shell .admin-lms-main>.comm-page,
+  body.ep-enterprise-shell .admin-lms-main>.lb-page,
+  body.ep-enterprise-shell .admin-lms-main>.invoice-page,
+  body.ep-enterprise-shell .admin-lms-main>.courses-page,
+  body.ep-enterprise-shell .admin-lms-main>.media-page{padding:16px!important}
+}

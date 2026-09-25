@@ -61,32 +61,31 @@
       }
 
       async function getAdminAccess(client, userId) {
-        const [{ data: profile, error: profileError }, { data: assignments, error: roleError }] =
+        const [{ data: profile, error: profileError }, { data: roleContext, error: roleError }] =
           await Promise.all([
             client
               .from("user_profiles")
-              .select("id, email, first_name, last_name, is_active")
+              .select("id, email, first_name, last_name, status")
               .eq("id", userId)
               .maybeSingle(),
 
-            client
-              .from("user_role_assignments")
-              .select("role")
-              .eq("user_id", userId)
+            client.functions.invoke("portal-access-context", {
+              body: { portal: "roles" }
+            })
           ]);
 
         if (profileError) throw profileError;
-        if (roleError) throw roleError;
+        if (roleError || roleContext?.error) throw roleError || new Error(roleContext.error);
 
         if (!profile) {
           return { allowed: false, reason: "This account does not have a user profile." };
         }
 
-        if (profile.is_active === false) {
+        if (profile.status === 'inactive') {
           return { allowed: false, reason: "This administrator account is inactive. Please contact a system administrator." };
         }
 
-        const roles = (assignments || []).map(item => String(item.role || "").toLowerCase());
+        const roles = (roleContext?.roles || []).map(role => String(role || "").toLowerCase());
         const allowedRole = roles.find(role => ADMIN_ROLES.includes(role));
 
         if (!allowedRole) {

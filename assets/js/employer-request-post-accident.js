@@ -28,7 +28,7 @@ function bindEvents(){
 }
 async function invoke(action,request){
   if(!db)throw new Error("The employer account connection is not ready.");
-  const {data,error}=await db.functions.invoke("employer-post-accident-actions",{body:{action,request}});
+  const {data,error}=await db.functions.invoke("employer-onsite-request-actions",{body:{action,request,request_type:"post_accident"}});
   if(error)throw error;if(data?.error)throw new Error(data.error);return data;
 }
 async function loadEmployees(){

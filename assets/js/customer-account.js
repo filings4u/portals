@@ -135,7 +135,7 @@
     const [profileResult, prefResult] = await Promise.all([
       state.db
         .from("user_profiles")
-        .select("id,first_name,last_name,display_name,email,phone,is_active,created_at,updated_at,company_name,address_line_1,address_line_2,city,state,postal_code")
+        .select("id,first_name,last_name,display_name,email,phone,status,metadata,created_at,updated_at")
         .eq("id", uid)
         .maybeSingle(),
       state.db
@@ -154,7 +154,7 @@
       display_name: state.user.user_metadata?.display_name || "",
       email: state.user.email || "",
       phone: state.user.phone || "",
-      is_active: true,
+      status: "active",
       created_at: state.user.created_at
     };
 
@@ -206,7 +206,7 @@
 
     const activeBadge = document.querySelector(".customer-account-active");
     if (activeBadge) {
-      activeBadge.textContent = profile.is_active === false ? "Inactive Account" : "Active Account";
+      activeBadge.textContent = profile.status === 'inactive' ? "Inactive Account" : "Active Account";
     }
   }
 
@@ -253,7 +253,7 @@
         .from("user_profiles")
         .update(patch)
         .eq("id", state.user.id)
-        .select("id,first_name,last_name,display_name,email,phone,is_active,created_at,updated_at,company_name,address_line_1,address_line_2,city,state,postal_code")
+        .select("id,first_name,last_name,display_name,email,phone,status,metadata,created_at,updated_at")
         .single();
 
       if (error) throw error;

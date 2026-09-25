@@ -78,7 +78,7 @@ async function trainingReport(action,payload={}){
   if(error)throw error;
   const token=data?.session?.access_token;
   if(!token)throw new Error("Your admin session has expired. Please sign in again.");
-  const base=String(window.SCREENINGS4U_SUPABASE_URL||"https://rgsrubdtljyxmnihwlah.supabase.co").replace(/\/$/,"");
+  const base=String(window.SCREENINGS4U_SUPABASE_URL||"https://elpbnytpciqnbexiaebp.supabase.co").replace(/\/$/,"");
   const anon=window.SCREENINGS4U_SUPABASE_ANON_KEY||window.SUPABASE_ANON_KEY||"";
   const response=await fetch(base+"/functions/v1/screenings4u-training-reporting",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token,...(anon?{"apikey":anon}:{})},body:JSON.stringify({action,...payload})});
   const out=await response.json().catch(()=>({}));

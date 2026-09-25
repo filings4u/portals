@@ -93,8 +93,8 @@ function getAdminNavigationMarkup() {
           </a>
 
           <a
-            href="${prefix}admin-employers.html"
-            data-nav-page="admin-employers.html"
+            href="${prefix}admin-organizations.html?business=testing&type=employer"
+            data-nav-page="admin-organizations.html"
           >
             Employers
           </a>
@@ -453,8 +453,8 @@ function getAdminNavigationMarkup() {
 
           <!--
           <a
-            href="${prefix}admin-employers.html"
-            data-nav-page="admin-employers.html"
+            href="${prefix}admin-organizations.html?business=testing&type=employer"
+            data-nav-page="admin-organizations.html"
           >
             System Users
           </a>

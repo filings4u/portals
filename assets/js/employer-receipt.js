@@ -50,18 +50,21 @@
 
       let employerName = "Employer";
 
-      if (order.employer_id) {
-        const { data: employer } = await db
-          .from("employer_profiles")
-          .select("employer_name,legal_name")
-          .eq("id", order.employer_id)
-          .maybeSingle();
-
-        employerName =
-          employer?.employer_name ||
-          employer?.legal_name ||
-          "Employer";
+      const { data: access, error: accessError } = await db.functions.invoke(
+        "portal-access-context",
+        { body: { portal: "employer" } }
+      );
+      if (accessError) throw accessError;
+      if (!access?.allowed || String(access?.employer_id || "") !== String(order.employer_id || "")) {
+        throw new Error(access?.reason || "This receipt is not available for your employer account.");
       }
+
+      employerName =
+        access?.organization?.dba_name ||
+        access?.organization?.legal_name ||
+        access?.employer?.dba_name ||
+        access?.employer?.legal_name ||
+        "Employer";
 
       render(order, items || [], employerName);
 

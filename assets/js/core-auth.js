@@ -222,20 +222,17 @@
     }
 
     const client = getClient();
-    const { data, error } = await client
-      .from("user_role_assignments")
-      .select("role")
-      .eq("user_id", id);
+    const { data, error } = await client.functions.invoke("portal-access-context", {
+      body: { portal: "roles" }
+    });
 
-    if (error) {
+    if (error || data?.error) {
       throw new Error(
-        `Unable to verify portal roles: ${error.message}`
+        `Unable to verify portal roles: ${data?.error || error?.message || "Unknown role error"}`
       );
     }
 
-    return uniqueRoles(
-      (data || []).map(row => row.role)
-    );
+    return uniqueRoles(data?.roles || []);
   }
 
   function userCanAccessPortal(

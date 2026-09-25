@@ -14,6 +14,7 @@
   const cart = JSON.parse(
     localStorage.getItem("s4u_employer_market_cart") || "[]"
   );
+  const invoiceId = new URLSearchParams(location.search).get("invoice_id");
 
   document.addEventListener("DOMContentLoaded", init);
 
@@ -21,7 +22,7 @@
 
     try {
 
-      if (!cart.length) {
+      if (!cart.length && !invoiceId) {
         location.replace("employer-catalog.html");
         return;
       }
@@ -32,20 +33,17 @@
 
       db = await getScreenings4uSupabase();
 
-      const catalog = await call("catalog");
-
-      const serviceMap = new Map(
-        (catalog.services || []).map((service) => [
-          service.id,
-          service
-        ])
-      );
-
-      renderSummary(serviceMap);
-
-      order = await call("prepare_checkout", {
-        items: cart
-      });
+      if (invoiceId) {
+        order = await call("prepare_checkout", { invoice_id: invoiceId });
+        renderInvoiceSummary(order);
+      } else {
+        const catalog = await call("catalog");
+        const serviceMap = new Map(
+          (catalog.services || []).map((service) => [service.id, service])
+        );
+        renderSummary(serviceMap);
+        order = await call("prepare_checkout", { items: cart });
+      }
 
       if (!order || !order.clientSecret) {
         throw new Error(
@@ -132,6 +130,14 @@
 
   }
 
+  function renderInvoiceSummary(data) {
+    const rows = Array.isArray(data?.items) ? data.items : [];
+    $("checkout-items").innerHTML = rows.map((item) => `
+      <div class="summary-line"><div><strong>${escapeHtml(item.name || data.label || "Invoice")}</strong><br><small>Invoice payment</small></div><span>${money(item.amount || 0)}</span></div>
+    `).join("");
+    $("checkout-total").textContent = money(Number(data?.amount || 0) / 100);
+  }
+
   async function call(action, payload = {}) {
 
     const {
@@ -201,9 +207,9 @@
           confirmParams: {
             return_url:
               new URL(
-                `employer-orders.html?id=${
-                  encodeURIComponent(order.orderId)
-                }`,
+                order.kind === "invoice"
+                  ? `employer-invoices.html?id=${encodeURIComponent(order.invoiceId)}`
+                  : `employer-orders.html?id=${encodeURIComponent(order.orderId)}`,
                 location.href
               ).href
           },
@@ -214,16 +220,15 @@
         throw error;
       }
 
-      localStorage.removeItem("s4u_employer_market_cart");
+      if (order.kind !== "invoice") localStorage.removeItem("s4u_employer_market_cart");
 
       $("checkout-success").hidden = false;
       button.hidden = true;
 
       window.setTimeout(() => {
-        location.href =
-          `employer-orders.html?id=${
-            encodeURIComponent(order.orderId)
-          }`;
+        location.href = order.kind === "invoice"
+          ? `employer-invoices.html?id=${encodeURIComponent(order.invoiceId)}`
+          : `employer-orders.html?id=${encodeURIComponent(order.orderId)}`;
       }, 1400);
 
     } catch (error) {

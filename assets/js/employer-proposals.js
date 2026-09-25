@@ -9,10 +9,42 @@ function bind(){
   ["request-proposal-btn","empty-request-proposal-btn","custom-proposal-btn"].forEach(id=>q(id)?.addEventListener("click",requestProposal));
   document.querySelectorAll("[data-close-proposal-modal]").forEach(x=>x.addEventListener("click",close));
 }
-async function call(body){const {data,error}=await db.functions.invoke("employer-proposal-actions",{body});if(error)throw error;if(data?.error)throw new Error(data.error);return data;}
+async function call(body){
+ const action=String(body?.action||"");
+ if(action==="list"){
+  const {data,error}=await db.from("testing_proposals").select("*,testing_proposal_items(*),testing_proposal_change_requests(*)").order("created_at",{ascending:false});
+  if(error)throw error;
+  return {proposals:(data||[]).map(p=>({...p,proposal_items:p.testing_proposal_items||[],change_requests:p.testing_proposal_change_requests||[]}))};
+ }
+ const id=String(body?.proposal_id||"");
+ const {data:{user}}=await db.auth.getUser();if(!user)throw new Error("Your employer session has expired.");
+ const current=state.proposals.find(x=>x.id===id);if(!current)throw new Error("Proposal not found.");
+ const now=new Date().toISOString();
+ if(action==="mark_viewed"&&current.status==="sent"){
+  const {error}=await db.from("testing_proposals").update({status:"viewed",updated_at:now}).eq("id",id);if(error)throw error;
+  await db.from("testing_proposal_events").insert({id:crypto.randomUUID(),proposal_id:id,event_type:"viewed",actor_user_id:user.id,metadata:{},created_at:now});
+ }
+ if(action==="accept"){
+  const {error}=await db.from("testing_proposals").update({status:"accepted",accepted_at:now,updated_at:now}).eq("id",id);if(error)throw error;
+  await db.from("testing_proposal_events").insert({id:crypto.randomUUID(),proposal_id:id,event_type:"accepted",actor_user_id:user.id,metadata:{},created_at:now});
+ }
+ if(action==="decline"){
+  const reason=String(body?.reason||"").trim();if(!reason)throw new Error("A decline reason is required.");
+  const {error}=await db.from("testing_proposals").update({status:"declined",declined_at:now,updated_at:now}).eq("id",id);if(error)throw error;
+  await db.from("testing_proposal_events").insert({id:crypto.randomUUID(),proposal_id:id,event_type:"declined",actor_user_id:user.id,metadata:{reason},created_at:now});
+ }
+ if(action==="request_changes"){
+  const changes=Array.isArray(body?.changes)?body.changes:[];if(!changes.length)throw new Error("Describe the requested change.");
+  const {error:ce}=await db.from("testing_proposal_change_requests").insert({id:crypto.randomUUID(),proposal_id:id,employer_id:current.employer_id,requested_by:user.id,status:"pending",summary:String(body?.summary||"").trim()||null,changes,created_at:now,updated_at:now});if(ce)throw ce;
+  const {error}=await db.from("testing_proposals").update({status:"changes_requested",updated_at:now}).eq("id",id);if(error)throw error;
+  await db.from("testing_proposal_events").insert({id:crypto.randomUUID(),proposal_id:id,event_type:"changes_requested",actor_user_id:user.id,metadata:{},created_at:now});
+ }
+ const {data,error}=await db.from("testing_proposals").select("*,testing_proposal_items(*),testing_proposal_change_requests(*)").eq("id",id).single();if(error)throw error;
+ return {proposal:{...data,proposal_items:data.testing_proposal_items||[],change_requests:data.testing_proposal_change_requests||[]}};
+}
 async function load(){const x=await call({action:"list"});state.proposals=x.proposals||[];summary();render();}
 function filtered(){const s=val("proposal-search").toLowerCase(), f=val("proposal-status-filter")||"all";return state.proposals.filter(p=>(!s||`${p.proposal_number||""} ${p.title||""}`.toLowerCase().includes(s))&&(f==="all"||status(p)===f));}
-function status(p){let s=String(p.status||"draft").toLowerCase();if(s==="in_review")return s;return ["draft","sent","viewed","accepted","declined","expired","cancelled"].includes(s)?s:"draft";}
+function status(p){let s=String(p.status||"draft").toLowerCase();if(s==="in_review"||s==="changes_requested")return "in_review";return ["draft","sent","viewed","accepted","declined","expired","cancelled"].includes(s)?s:"draft";}
 function render(){
  const body=q("proposal-table-body");if(!body)return;const rows=filtered();
  if(!rows.length){body.innerHTML=`<tr><td colspan="7"><div class="proposal-empty-state"><div class="proposal-empty-icon">▤</div><h3>${state.proposals.length?"No proposals match your filters":"No proposals available"}</h3><p>${state.proposals.length?"Try changing your search or status filter.":"Proposals prepared for your organization will appear here."}</p>${state.proposals.length?"":'<button type="button" class="proposal-secondary-btn" id="empty-request-proposal-btn">Request a Proposal</button>'}</div></td></tr>`;q("empty-request-proposal-btn")?.addEventListener("click",requestProposal);return;}

@@ -66,24 +66,17 @@
       throw new Error("Your login session expired. Please sign in again.");
     }
 
-    const { data: memberships, error: membershipError } = await state.db
-      .from("employer_members")
-      .select("employer_id,is_primary,status")
-      .eq("user_id", session.user.id)
-      .eq("status", "active");
+    const { data: access, error: accessError } = await state.db.functions.invoke(
+      "portal-access-context",
+      { body: { portal: "employer" } }
+    );
 
-    if (membershipError) throw membershipError;
-
-    const employerIds = [...new Set(
-      (memberships || []).map((row) => row.employer_id).filter(Boolean)
-    )];
-
-    if (!employerIds.length) {
-      state.orders = [];
-      updateMetrics();
-      renderOrders();
-      return;
+    if (accessError) throw accessError;
+    if (!access?.allowed || !access?.employer_id) {
+      throw new Error(access?.reason || "Active employer portal access was not found.");
     }
+
+    const employerIds = [access.employer_id];
 
     const { data: orders, error: ordersError } = await state.db
       .from("orders")

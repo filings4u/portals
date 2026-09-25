@@ -344,54 +344,14 @@
       ];
 
       async function verifyPortalAccess(client, userId) {
-        const [{ data: profile, error: profileError }, { data: assignments, error: roleError }, { data: memberships, error: membershipError }] =
-          await Promise.all([
-            client
-              .from("user_profiles")
-              .select("id, is_active")
-              .eq("id", userId)
-              .maybeSingle(),
-            client
-              .from("user_role_assignments")
-              .select("role")
-              .eq("user_id", userId),
-            client
-              .from("employer_members")
-              .select("employer_id, status")
-              .eq("user_id", userId)
-              .eq("status", "active")
-              .limit(1)
-          ]);
-
-        if (profileError) throw profileError;
-        if (roleError) throw roleError;
-        if (membershipError) throw membershipError;
-        if (!profile) return { allowed:false, reason:"This account does not have a user profile." };
-        if (profile.is_active === false) return { allowed:false, reason:"This account is inactive. Please contact your administrator." };
-
-        const roles = (assignments || []).map(item => String(item.role || "").toLowerCase());
-        if (!roles.some(role => EMPLOYER_ROLES.includes(role))) {
-          return { allowed:false, reason:"This account does not have access to the employer portal." };
+        const { data, error } = await client.functions.invoke("portal-access-context", {
+          body: { portal: "employer" }
+        });
+        if (error) throw error;
+        if (data?.error && !data?.allowed) {
+          return { allowed:false, reason:data.reason || data.error };
         }
-
-        const membership = memberships?.[0];
-        if (!membership?.employer_id) {
-          return { allowed:false, reason:"This account is not linked to an active employer." };
-        }
-
-        const { data: employer, error: employerError } = await client
-          .from("employer_profiles")
-          .select("id, status")
-          .eq("id", membership.employer_id)
-          .maybeSingle();
-
-        if (employerError) throw employerError;
-        if (!employer) return { allowed:false, reason:"The employer account could not be found." };
-        if (String(employer.status || "").toLowerCase() !== "active") {
-          return { allowed:false, reason:"This employer account is inactive. Please contact your administrator." };
-        }
-
-        return { allowed:true, employerId: employer.id };
+        return data || { allowed:false, reason:"Unable to verify portal access." };
       }
 
       async function redirectIfAlreadySignedIn() {

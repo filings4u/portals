@@ -154,17 +154,18 @@
       if (link) { link.textContent = 'Opening DOT Portal…'; link.setAttribute('aria-disabled','true'); }
       const { data: { session } } = await S.db.auth.getSession();
       if (!session?.access_token) throw new Error('Your screenings4u session has expired. Please sign in again.');
-      const r = await fetch('https://wyezpseboxbmkedvbmyx.supabase.co/functions/v1/workforce-internal-gateway', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({ action: 'customer_sso_handoff', product_code: 'dot', portal_code: 'ctpa_dot' })
+      const { data: body, error } = await S.db.functions.invoke('portal-session-handoff', {
+        body: {
+          action: 'create',
+          surface: 'dot',
+          portal_code: 'ctpa_dot',
+          next: '/ctpa/dashboard.html'
+        }
       });
-      const body = await r.json().catch(() => ({}));
-      if (!r.ok || body?.error || !body?.handoff_url) throw new Error(body?.error || 'Unable to open the DOT C/TPA portal.');
-      window.location.href = body.handoff_url;
+      if (error || body?.error || !body?.redirect_url) {
+        throw new Error(body?.error || error?.message || 'Unable to open the DOT C/TPA portal.');
+      }
+      window.location.href = body.redirect_url;
     } catch (e) {
       console.error('[Customer Dashboard] DOT SSO', e);
       if (window.S4UUI?.alert) window.S4UUI.alert(e.message || 'Unable to open the DOT portal.', { title: 'Portal Access' });
