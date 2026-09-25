@@ -23,17 +23,22 @@ function renderPhases(){const host=$('#phaseGrid');host.innerHTML=phases.map(([n
 function metric(label,value,copy){return `<article><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(copy)}</small></article>`}
 function businessCount(overview,code){return Number(overview?.counts?.[code]?.accounts||0)}
 function setReady(items){$('#readinessList').innerHTML=items.map(x=>`<div><i class="${x.ok?'ok':'bad'}"></i><span><strong>${esc(x.title)}</strong><small>${esc(x.copy)}</small></span></div>`).join('')}
-async function load(){const err=$('#pageError');if(err){err.hidden=true;err.textContent=''};$('#controlPlaneStatus').textContent='Checking control plane…';$('#controlPlaneDetail').textContent='Validating production services';
- const results=await Promise.allSettled([call('overview'),call('accounts'),call('people'),call('work_management_module',{module:'overview'})]);
- const overview=results[0].status==='fulfilled'?results[0].value:null,accountsData=results[1].status==='fulfilled'?results[1].value:null,people=results[2].status==='fulfilled'?results[2].value:null,work=results[3].status==='fulfilled'?results[3].value:null;
- const failures=results.filter(x=>x.status==='rejected');
- const orgs=new Set((accountsData?.accounts||[]).map(x=>x.organization_id).filter(Boolean));
- const counts=work?.data?.counts||{};
- $('#executiveMetrics').innerHTML=metric('Enterprise Accounts',overview?.total_accounts??'—','Across authorized business units')+metric('Organizations',orgs.size||'—','Unified business identities')+metric('People',people?.people?.length??'—','Unified person identities')+metric('Open Work Items',counts.open_tasks??'—','CRM and internal tasks');
- const wf=businessCount(overview,'workforce'),dot=businessCount(overview,'dot'),testing=businessCount(overview,'testing');
- $('#workforceCount').textContent=`${wf} Enterprise account${wf===1?'':'s'} →`;$('#dotCount').textContent=`${dot} Enterprise account${dot===1?'':'s'} →`;$('#testingCount').textContent=testing?`${testing} Enterprise account${testing===1?'':'s'} →`:'Open workspace →';
- const ready=[{ok:!!overview,title:'Enterprise identity & account directory',copy:overview?`${overview.total_accounts||0} accounts visible to your role.`:(results[0].reason?.message||'Unavailable')},{ok:!!accountsData,title:'Organizations & account directory',copy:accountsData?`${accountsData.accounts?.length||0} account records loaded.`:(results[1].reason?.message||'Unavailable')},{ok:!!people,title:'People & access projection',copy:people?`${people.people?.length||0} people visible to your role.`:(results[2].reason?.message||'Unavailable')},{ok:!!work,title:'Phase 15 work management',copy:work?`${counts.communication_threads||0} communication threads · ${counts.appointments||0} appointments.`:(results[3].reason?.message||'Unavailable')}];setReady(ready);
- if(failures.length){$('#controlPlaneStatus').textContent='Production attention required';$('#controlPlaneDetail').textContent=`${failures.length} control-plane check${failures.length===1?'':'s'} failed`;if(err){err.hidden=false;err.textContent=failures.map(x=>x.reason?.message||String(x.reason)).join(' · ')}}else{$('#controlPlaneStatus').textContent='Enterprise control plane online';$('#controlPlaneDetail').textContent='Phase 1–15 backend checks passed'}
+async function load(){const err=$('#pageError');if(err){err.hidden=true;err.textContent=''};$('#controlPlaneStatus').textContent='Checking control plane…';$('#controlPlaneDetail').textContent='Loading executive summary';
+ try{
+  const summary=await call('dashboard_summary');
+  $('#executiveMetrics').innerHTML=metric('Enterprise Accounts',summary.total_accounts??0,'Active customer/business relationships')+metric('Organizations',summary.organization_count??0,'Unified business identities')+metric('People',summary.people_count??0,'Unified person identities')+metric('Open Work Items',summary.open_tasks??0,'CRM and internal tasks');
+  const wf=businessCount(summary,'workforce'),dot=businessCount(summary,'dot'),testing=businessCount(summary,'testing');
+  $('#workforceCount').textContent=`${wf} Enterprise account${wf===1?'':'s'} →`;$('#dotCount').textContent=`${dot} Enterprise account${dot===1?'':'s'} →`;$('#testingCount').textContent=testing?`${testing} Enterprise account${testing===1?'':'s'} →`:'Open workspace →';
+  setReady([
+   {ok:true,title:'Enterprise identity & account directory',copy:`${summary.total_accounts||0} active accounts visible to your role.`},
+   {ok:true,title:'Organizations',copy:`${summary.organization_count||0} organizations in the authorized business scope.`},
+   {ok:true,title:'People & access projection',copy:`${summary.people_count||0} people in the unified identity layer.`},
+   {ok:true,title:'Work management',copy:`${summary.open_tasks||0} open work items.`}
+  ]);
+  $('#controlPlaneStatus').textContent='Enterprise control plane online';$('#controlPlaneDetail').textContent='Executive summary loaded';
+ }catch(e){
+  $('#controlPlaneStatus').textContent='Production attention required';$('#controlPlaneDetail').textContent='Executive summary failed';setReady([{ok:false,title:'Enterprise summary',copy:e?.message||String(e)}]);if(err){err.hidden=false;err.textContent=e?.message||String(e)}
+ }
 }
 async function init(){renderPhases();await load();$('#refreshEnterprise')?.addEventListener('click',load)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();

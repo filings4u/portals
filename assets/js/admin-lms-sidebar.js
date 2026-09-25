@@ -457,7 +457,7 @@ bindUserDropdown();
         },
         {
           label: "Intake Documents",
-          href: "intake-documents.html",
+          href: "admin-intake-documents.html",
           icon: "document"
         },
         {

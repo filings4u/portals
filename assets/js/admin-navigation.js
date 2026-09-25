@@ -435,7 +435,7 @@ function getAdminNavigationMarkup() {
           <a href="${prefix}admin-seo.html" data-nav-page="admin-seo.html">SEO Management</a>
           <a href="${prefix}admin-search-submissions.html" data-nav-page="admin-search-submissions.html">Search Submission</a>
           <a href="${prefix}admin-forms.html" data-nav-page="admin-forms.html">Forms Editor</a>
-          <a href="${prefix}intake-documents.html" data-nav-page="intake-documents.html">Intake Documents</a>
+          <a href="${prefix}admin-intake-documents.html" data-nav-page="admin-intake-documents.html">Intake Documents</a>
           <a href="${prefix}admin-tasks.html" data-nav-page="admin-tasks.html">Task Manager</a>
 
           <a

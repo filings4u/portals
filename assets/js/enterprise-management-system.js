@@ -19,37 +19,8 @@ window.S4UConfirm=function(message,options={}){if(confirmActive)return Promise.r
 let routed=null;
 function routeModal(modal){if(routed||!modal?.id||modal.id==='epSearchModal')return;const dialog=modal.querySelector('.ecp-dialog,.modal-dialog,[role="dialog"]')||modal.firstElementChild;if(!dialog)return;const root=currentPageRoot(),children=[...root.children];children.forEach(x=>x.classList.add('s4u-route-hidden'));const holder=document.createElement('section');holder.className='s4u-management-route';holder.dataset.modalId=modal.id;holder.innerHTML='<div class="s4u-route-head"><div><h1>Management</h1><p>Complete this management action, then return to the workspace.</p></div><button class="s4u-route-back" type="button">← Back</button></div><div class="s4u-route-body"></div>';holder.querySelector('.s4u-route-body').appendChild(dialog);root.appendChild(holder);modal.classList.remove('open','active','show');modal.classList.add('s4u-routed-modal');const u=new URL(location.href);u.searchParams.set('manage',modal.id);history.pushState({s4uManage:modal.id},'',u);routed={modal,dialog,holder,children};const back=()=>closeRoute();holder.querySelector('.s4u-route-back').onclick=back;qsa('[data-close],.modal-close',holder).forEach(b=>b.addEventListener('click',e=>{e.preventDefault();back()},{capture:true}));}
 function closeRoute(){if(!routed)return;const {modal,dialog,holder,children}=routed;modal.appendChild(dialog);holder.remove();modal.classList.remove('s4u-routed-modal','open','active','show');children.forEach(x=>x.classList.remove('s4u-route-hidden'));const u=new URL(location.href);u.searchParams.delete('manage');history.replaceState({},'',u);routed=null}
-function observe(){
-  const obs=new MutationObserver(ms=>{
-    for(const m of ms){
-      for(const n of m.addedNodes||[]){
-        if(n instanceof HTMLElement){
-          if(n.matches('.ecp-alert')) alertToToast(n);
-          qsa('.ecp-alert',n).forEach(alertToToast);
-        }
-      }
-      if(m.type==='attributes'&&m.target instanceof HTMLElement){
-        const el=m.target;
-        if(routed&&el===routed.modal&&(!el.classList.contains('open')&&!el.classList.contains('show')&&!el.classList.contains('active')||el.getAttribute('aria-hidden')==='true')){
-          closeRoute();
-          continue;
-        }
-        if(el.matches('.ecp-route-panel,.modal,[class*="-modal"],[role="dialog"],[aria-modal="true"]')){
-          const visuallyOpen=el.classList.contains('open')||el.classList.contains('show')||el.classList.contains('active')||el.getAttribute('aria-hidden')==='false'||(m.attributeName==='hidden'&&!el.hidden)||(!el.hidden&&el.style.display&&el.style.display!=='none');
-          if(visuallyOpen){
-            const target=el.matches('[role="dialog"],[aria-modal="true"]')?(el.closest('.ecp-route-panel,.modal,[class*="-modal"]')||el):el;
-            routeModal(target);
-          }
-        }
-      }
-    }
-  });
-  obs.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden','style','aria-hidden']});
-  qsa('.ecp-alert').forEach(alertToToast);
-  qsa('.ecp-route-panel.open,.modal.open,.modal.show,[class*="-modal"][aria-hidden="false"],[role="dialog"][aria-hidden="false"],[aria-modal="true"][aria-hidden="false"]').forEach(routeModal);
-}
 window.S4UFontSizer={refresh:addFontSizer,set:applyFont,get:fontValue};applyFont(fontValue());
-function wire(){applyFont(fontValue());addFontSizer();patchInvoke();observe();const timer=setInterval(()=>{addFontSizer();if(patchInvoke())clearInterval(timer)},300);setTimeout(()=>clearInterval(timer),10000)}
+function wire(){applyFont(fontValue());addFontSizer();patchInvoke();}
 window.addEventListener('popstate',()=>{if(routed)closeRoute()});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
 })();
