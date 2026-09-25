@@ -1,465 +1,85 @@
 /**
- * screenings4u — Portal Session Security
- *
- * Automatically signs authenticated portal users out after inactivity.
- * This is a browser-side safety control; Supabase RLS remains responsible
- * for protecting database records and operations.
- *
- * Required protected-page body attribute:
- *   <body data-s4u-portal="customer">
- *
- * Supported values:
- *   admin | customer | employer | employee | training
+ * screenings4u — Universal Portal Session Security
+ * 10-minute inactivity timeout with branded one-minute warning.
+ * Activity is synchronized across tabs on the same portal origin.
+ * Training pages only count meaningful course-player interactions.
  */
-
-(() => {
+(()=>{
   "use strict";
+  const IDLE_LIMIT=10*60*1000;
+  const WARNING=60*1000;
+  const THROTTLE=750;
+  const ACTIVITY_KEY="s4u-security-last-activity-v2";
+  const WARNING_ID="s4u-session-warning";
+  let logoutTimer=null, warningTimer=null, countdownTimer=null;
+  let lastActivity=0, started=false, signingOut=false;
 
-  const IDLE_LIMITS = Object.freeze({
-    admin: 15 * 60 * 1000,
-    customer: 10 * 60 * 1000,
-    employer: 10 * 60 * 1000,
-    employee: 10 * 60 * 1000,
-    training: 10 * 60 * 1000
-  });
-
-  const WARNING_DURATION = 60 * 1000;
-  const ACTIVITY_THROTTLE = 1000;
-  const ACTIVITY_EVENTS = Object.freeze([
-    "pointerdown",
-    "keydown",
-    "touchstart",
-    "scroll"
-  ]);
-
-  const WARNING_ID = "s4u-session-warning";
-  const ACTIVITY_KEY = "s4u-last-activity";
-  const AUTH_STORAGE_KEY = "s4u-auth-session";
-
-  let logoutTimer = null;
-  let warningTimer = null;
-  let countdownTimer = null;
-  let lastActivity = 0;
-  let started = false;
-  let signingOut = false;
-
-  function getPortal() {
-    const explicitPortal = String(
-      document.body?.dataset?.s4uPortal ||
-      document.documentElement?.dataset?.s4uPortal ||
-      ""
-    )
-      .trim()
-      .toLowerCase();
-
-    if (Object.prototype.hasOwnProperty.call(IDLE_LIMITS, explicitPortal)) {
-      return explicitPortal;
-    }
-
-    // Fallback for existing protected pages that do not yet include
-    // data-s4u-portal. The page filename already follows a portal prefix
-    // convention throughout Screenings4u.
-    const pageName = String(window.location.pathname || "")
-      .split("/")
-      .pop()
-      .toLowerCase();
-
-    const inferredPortal =
-      pageName.startsWith("customer-")
-        ? "customer"
-        : pageName.startsWith("employer-")
-          ? "employer"
-          : pageName.startsWith("employee-")
-            ? "employee"
-            : pageName.startsWith("admin-")
-              ? "admin"
-              : (
-                  pageName.startsWith("lms-") ||
-                  pageName.startsWith("training-")
-                )
-                ? "training"
-                : "";
-
-    if (inferredPortal) {
-      // Normalize the page for every other shared security/auth script.
-      if (document.body) {
-        document.body.dataset.s4uPortal = inferredPortal;
-      } else {
-        document.documentElement.dataset.s4uPortal = inferredPortal;
-      }
-
-      return inferredPortal;
-    }
-
-    return "";
+  const portal=()=>String(document.body?.dataset?.s4uPortal||document.documentElement?.dataset?.s4uPortal||inferPortal()).toLowerCase();
+  function inferPortal(){
+    const n=(location.pathname.split('/').pop()||'').toLowerCase();
+    if(n.startsWith('admin-')) return 'admin';
+    if(n.startsWith('customer-')) return 'customer';
+    if(n.startsWith('employer-')) return 'employer';
+    if(n.startsWith('employee-')) return 'employee';
+    if(n.includes('course')||n.includes('lesson')||n.includes('training')||location.hostname==='training.screenings4u.com') return 'training';
+    return '';
   }
-
-  function getIdleLimit() {
-    return IDLE_LIMITS[getPortal()] || null;
+  function storage(){try{return localStorage}catch{return sessionStorage}}
+  function readActivity(){const n=Number(storage().getItem(ACTIVITY_KEY)||0);return Number.isFinite(n)?n:0}
+  function writeActivity(v){try{storage().setItem(ACTIVITY_KEY,String(v))}catch{}}
+  function clearTimers(){clearTimeout(logoutTimer);clearTimeout(warningTimer);clearInterval(countdownTimer);logoutTimer=warningTimer=countdownTimer=null}
+  function removeWarning(){document.getElementById(WARNING_ID)?.remove()}
+  function loginPage(){
+    const p=portal();
+    return window.S4UAuth?.getLoginForPortal?.(p) || (p==='training'?'https://training.screenings4u.com/training-login.html':`${p||'customer'}-login.html`);
   }
-
-  function getLoginPage() {
-    const portal = getPortal();
-
-    return (
-      window.S4UAuth?.getLoginForPortal?.(portal) ||
-      (portal === "training"
-        ? "https://training.screenings4u.com/training-login.html"
-        : `${portal || "customer"}-login.html`)
-    );
+  async function signOut(){
+    if(signingOut) return; signingOut=true; clearTimers(); removeWarning();
+    const dest=loginPage();
+    try{
+      if(window.S4UAuth?.signOut){await window.S4UAuth.signOut({redirectTo:dest});return}
+      const c=window.screenings4uSupabase||window.supabaseClient;
+      if(c?.auth?.signOut) await c.auth.signOut();
+    }catch(e){console.error('[Session security] sign out failed',e)}
+    try{storage().removeItem(ACTIVITY_KEY)}catch{}
+    location.replace(dest);
   }
-
-  function clearTimers() {
-    window.clearTimeout(logoutTimer);
-    window.clearTimeout(warningTimer);
-    window.clearInterval(countdownTimer);
-
-    logoutTimer = null;
-    warningTimer = null;
-    countdownTimer = null;
+  function button(label,fn,primary){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText=`min-height:44px;padding:0 18px;border-radius:9px;border:1px solid ${primary?'#ff6b00':'#24467f'};background:${primary?'#ff6b00':'#fff'};color:${primary?'#fff':'#24467f'};font:800 14px Inter,Arial,sans-serif;cursor:pointer`;b.addEventListener('click',fn);return b}
+  function showWarning(){
+    if(signingOut||document.getElementById(WARNING_ID)) return;
+    let seconds=60;
+    const o=document.createElement('div');o.id=WARNING_ID;o.style.cssText='position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:24px;background:rgba(16,47,85,.78);font-family:Inter,Arial,sans-serif';
+    const m=document.createElement('section');m.setAttribute('role','alertdialog');m.setAttribute('aria-modal','true');m.style.cssText='width:min(470px,100%);padding:30px;border-radius:16px;background:#fff;border-top:5px solid #ff6b00;box-shadow:0 24px 70px rgba(0,0,0,.28);text-align:center';
+    const brand=document.createElement('div');brand.textContent='SCREENINGS4U';brand.style.cssText='font-size:11px;letter-spacing:.14em;font-weight:900;color:#ff6b00;margin-bottom:10px';
+    const h=document.createElement('h2');h.textContent='Your session is about to end';h.style.cssText='margin:0 0 10px;color:#102f55;font-size:24px';
+    const p=document.createElement('p');p.textContent='For your security, you will be signed out after 10 minutes of inactivity.';p.style.cssText='margin:0 0 10px;color:#667892;line-height:1.55';
+    const c=document.createElement('p');c.style.cssText='margin:0 0 22px;color:#1d2d45';const strong=document.createElement('strong');strong.textContent='60';c.append('Signing out in ',strong,' seconds.');
+    const a=document.createElement('div');a.style.cssText='display:flex;justify-content:center;gap:10px;flex-wrap:wrap';a.append(button('Stay Logged In',()=>touch(true),true),button('Sign Out Now',signOut,false));
+    m.append(brand,h,p,c,a);o.append(m);document.body.append(o);m.querySelector('button')?.focus();
+    countdownTimer=setInterval(()=>{seconds-=1;strong.textContent=String(Math.max(0,seconds));if(seconds<=0)signOut()},1000);
   }
-
-  function removeWarning() {
-    document.getElementById(WARNING_ID)?.remove();
+  function schedule(){
+    if(!started||signingOut) return; clearTimers(); removeWarning();
+    const elapsed=Math.max(0,Date.now()-lastActivity), remaining=Math.max(0,IDLE_LIMIT-elapsed);
+    if(!remaining){signOut();return}
+    const warnIn=Math.max(0,remaining-WARNING); if(!warnIn)showWarning(); else warningTimer=setTimeout(showWarning,warnIn);
+    logoutTimer=setTimeout(signOut,remaining);
   }
-
-  function clearApplicationSessionStorage() {
-    try {
-      window.sessionStorage.removeItem(ACTIVITY_KEY);
-      window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
-    } catch (error) {
-      console.error(
-        "[Session security] Unable to clear application session storage:",
-        error
-      );
-    }
+  function touch(force=false){if(!started||signingOut)return;const now=Date.now();if(!force&&now-lastActivity<THROTTLE)return;lastActivity=now;writeActivity(now);schedule()}
+  function isTrainingMeaningful(target){
+    if(portal()!=='training') return true;
+    const el=target?.closest?.('[data-s4u-course-player],[data-course-player],#course-player,.course-player,.lesson-player,.video-player,button,a,input,select,textarea,[role="button"]');
+    return !!el;
   }
-
-  async function signOut() {
-    if (signingOut) {
-      return;
-    }
-
-    signingOut = true;
-    clearTimers();
-    removeWarning();
-
-    const destination = getLoginPage();
-
-    try {
-      if (typeof window.S4UAuth?.signOut === "function") {
-        await window.S4UAuth.signOut({
-          redirectTo: destination
-        });
-        return;
-      }
-
-      const client =
-        window.screenings4uSupabase ||
-        window.supabaseClient;
-
-      if (client?.auth?.signOut) {
-        await client.auth.signOut();
-      }
-    } catch (error) {
-      console.error(
-        "[Session security] Sign-out failed:",
-        error
-      );
-    }
-
-    // Emergency fallback: remove only screenings4u session keys.
-    clearApplicationSessionStorage();
-    window.location.replace(destination);
+  function onActivity(e){if(isTrainingMeaningful(e.target))touch(false)}
+  function establishBaseline(state){
+    const stored=readActivity();
+    const signedInAt=Date.parse(state?.user?.last_sign_in_at||'')||0;
+    if(!stored||stored<signedInAt){lastActivity=Date.now();writeActivity(lastActivity)}else lastActivity=stored;
   }
-
-  function createButton(label, action, primary = false) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = label;
-    button.style.cssText = [
-      "min-height:44px",
-      "padding:0 18px",
-      "border-radius:8px",
-      primary
-        ? "border:1px solid #ff6b00"
-        : "border:1px solid #24467f",
-      primary
-        ? "background:#ff6b00"
-        : "background:#ffffff",
-      primary ? "color:#ffffff" : "color:#24467f",
-      "font:700 14px Inter,Arial,sans-serif",
-      "cursor:pointer"
-    ].join(";");
-    button.addEventListener("click", action);
-    return button;
-  }
-
-  function showWarning() {
-    if (signingOut || document.getElementById(WARNING_ID)) {
-      return;
-    }
-
-    let secondsRemaining = Math.ceil(
-      WARNING_DURATION / 1000
-    );
-
-    const overlay = document.createElement("div");
-    overlay.id = WARNING_ID;
-    overlay.style.cssText = [
-      "position:fixed",
-      "inset:0",
-      "z-index:2147483647",
-      "display:grid",
-      "place-items:center",
-      "padding:24px",
-      "background:rgba(17,36,67,.72)",
-      "font-family:Inter,Arial,sans-serif"
-    ].join(";");
-
-    const modal = document.createElement("section");
-    modal.setAttribute("role", "alertdialog");
-    modal.setAttribute("aria-modal", "true");
-    modal.setAttribute("aria-labelledby", "s4u-session-title");
-    modal.setAttribute(
-      "aria-describedby",
-      "s4u-session-description"
-    );
-    modal.style.cssText = [
-      "width:min(460px,100%)",
-      "padding:30px",
-      "border-radius:14px",
-      "background:#ffffff",
-      "box-shadow:0 18px 50px rgba(0,0,0,.22)",
-      "text-align:center"
-    ].join(";");
-
-    const title = document.createElement("h2");
-    title.id = "s4u-session-title";
-    title.textContent = "Are you still there?";
-    title.style.cssText =
-      "margin:0 0 12px;color:#24467f;font-size:24px;";
-
-    const description = document.createElement("p");
-    description.id = "s4u-session-description";
-    description.textContent =
-      "For your security, you will be signed out due to inactivity.";
-    description.style.cssText =
-      "margin:0 0 10px;color:#667892;line-height:1.6;";
-
-    const countdownText = document.createElement("p");
-    countdownText.style.cssText =
-      "margin:0 0 22px;color:#1d2d45;line-height:1.6;";
-    countdownText.append("Signing out in ");
-
-    const countdown = document.createElement("strong");
-    countdown.textContent = String(secondsRemaining);
-    countdownText.append(countdown, " seconds.");
-
-    const actions = document.createElement("div");
-    actions.style.cssText =
-      "display:flex;justify-content:center;gap:10px;flex-wrap:wrap;";
-
-    const stayButton = createButton(
-      "Stay Logged In",
-      () => resetActivity(true),
-      true
-    );
-    const signOutButton = createButton(
-      "Sign Out Now",
-      signOut
-    );
-
-    actions.append(stayButton, signOutButton);
-    modal.append(title, description, countdownText, actions);
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-    stayButton.focus();
-
-    countdownTimer = window.setInterval(() => {
-      secondsRemaining -= 1;
-      countdown.textContent = String(
-        Math.max(0, secondsRemaining)
-      );
-
-      if (secondsRemaining <= 0) {
-        signOut();
-      }
-    }, 1000);
-  }
-
-  function scheduleTimers() {
-    const idleLimit = getIdleLimit();
-
-    if (!idleLimit || signingOut) {
-      return;
-    }
-
-    clearTimers();
-    removeWarning();
-
-    const elapsed = Math.max(
-      0,
-      Date.now() - lastActivity
-    );
-    const timeUntilLogout = Math.max(
-      0,
-      idleLimit - elapsed
-    );
-    const timeUntilWarning = Math.max(
-      0,
-      timeUntilLogout - WARNING_DURATION
-    );
-
-    if (timeUntilLogout === 0) {
-      signOut();
-      return;
-    }
-
-    if (timeUntilWarning === 0) {
-      showWarning();
-    } else {
-      warningTimer = window.setTimeout(
-        showWarning,
-        timeUntilWarning
-      );
-    }
-
-    logoutTimer = window.setTimeout(
-      signOut,
-      timeUntilLogout
-    );
-  }
-
-  function saveActivityTime(value) {
-    try {
-      window.sessionStorage.setItem(
-        ACTIVITY_KEY,
-        String(value)
-      );
-    } catch (error) {
-      console.error(
-        "[Session security] Unable to save activity time:",
-        error
-      );
-    }
-  }
-
-  function resetActivity(force = false) {
-    if (!started || signingOut) {
-      return;
-    }
-
-    const now = Date.now();
-
-    if (
-      !force &&
-      now - lastActivity < ACTIVITY_THROTTLE
-    ) {
-      return;
-    }
-
-    lastActivity = now;
-    saveActivityTime(now);
-    scheduleTimers();
-  }
-
-  function handleActivity() {
-    resetActivity(false);
-  }
-
-  function checkElapsedTime() {
-    if (
-      document.visibilityState === "visible" &&
-      started &&
-      !signingOut
-    ) {
-      scheduleTimers();
-    }
-  }
-
-  function start() {
-    if (started || signingOut) {
-      return;
-    }
-
-    if (!getIdleLimit()) {
-      console.error(
-        "[Session security] Unable to determine portal. Add data-s4u-portal=\"admin|customer|employer|employee|training\" to <body>."
-      );
-      return;
-    }
-
-    started = true;
-    lastActivity = Date.now();
-    saveActivityTime(lastActivity);
-
-    ACTIVITY_EVENTS.forEach((eventName) => {
-      document.addEventListener(
-        eventName,
-        handleActivity,
-        { passive: true }
-      );
-    });
-
-    document.addEventListener(
-      "visibilitychange",
-      checkElapsedTime
-    );
-
-    scheduleTimers();
-  }
-
-  function stop() {
-    clearTimers();
-    removeWarning();
-
-    ACTIVITY_EVENTS.forEach((eventName) => {
-      document.removeEventListener(
-        eventName,
-        handleActivity
-      );
-    });
-
-    document.removeEventListener(
-      "visibilitychange",
-      checkElapsedTime
-    );
-
-    started = false;
-  }
-
-  // Start only after the shared portal guard has authorized the user.
-  window.addEventListener(
-    "s4u:authenticated",
-    start
-  );
-
-  // Also support pages where this file loads after authorization completed.
-  function startIfAlreadyAuthenticated() {
-    if (
-      document.documentElement.classList.contains(
-        "s4u-authenticated"
-      )
-    ) {
-      start();
-    }
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      startIfAlreadyAuthenticated,
-      { once: true }
-    );
-  } else {
-    startIfAlreadyAuthenticated();
-  }
-
-  window.S4USessionSecurity = Object.freeze({
-    start,
-    stop,
-    reset: () => resetActivity(true),
-    signOut
-  });
+  async function preflight(state){establishBaseline(state);if(Date.now()-lastActivity>=IDLE_LIMIT){await signOut();return false}return true}
+  function start(ev){if(started||signingOut)return;started=true;establishBaseline(ev?.detail||null);['pointerdown','keydown','touchstart','input','change'].forEach(n=>document.addEventListener(n,onActivity,{passive:true}));if(portal()!=='training')document.addEventListener('scroll',onActivity,{passive:true});document.addEventListener('play',onActivity,true);document.addEventListener('seeked',onActivity,true);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){lastActivity=readActivity()||lastActivity;schedule()}});window.addEventListener('storage',e=>{if(e.key===ACTIVITY_KEY){lastActivity=Number(e.newValue||0)||lastActivity;schedule()}});schedule()}
+  window.addEventListener('s4u:authenticated',start);
+  window.addEventListener('s4u:training-ready',start);
+  window.S4USessionSecurity=Object.freeze({start,reset:()=>touch(true),touch:()=>touch(true),signOut,preflight,isExpired:()=>!!readActivity()&&Date.now()-readActivity()>=IDLE_LIMIT});
 })();

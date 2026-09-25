@@ -210,6 +210,13 @@
       return null;
     }
 
+    // Never reveal cached/refreshed portal markup when the local idle window
+    // has already expired. The session security runtime signs out first.
+    if (window.S4USessionSecurity?.preflight) {
+      const allowed = await window.S4USessionSecurity.preflight(state);
+      if (!allowed) return null;
+    }
+
     markAuthenticated(state);
     return state;
   }

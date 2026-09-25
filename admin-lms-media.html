@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html class="s4u-auth-pending" lang="en">
-<head>
+<head><style id="s4u-preauth-style">html.s4u-auth-pending body{visibility:hidden!important}html.s4u-auth-pending #s4u-auth-blocking-error{visibility:visible!important}</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#325aa3" />
@@ -45,7 +45,7 @@
 </style>
 <link rel="stylesheet" href="assets/css/enterprise-portal.css?v=20260924-design-v5">
 <link rel="stylesheet" href="assets/css/enterprise-management-system.css?v=20260924-design-v5"></head>
-<body>
+<body data-s4u-portal="admin">
 <div class="admin-lms-app">
 <div id="admin-lms-sidebar-target"></div>
 <main class="admin-lms-main">
@@ -151,12 +151,12 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/supabase-config.js"></script><script src="assets/js/enterprise-management-system.js?v=20260924-design-v5"></script>
-<script src="assets/js/core-auth.js?v=20260924-phase6"></script>
+<script src="assets/js/enterprise-management-system.js?v=20260924-design-v5"></script>
+
 <script src="assets/js/ui.js"></script>
-<script src="assets/js/session-security.js"></script>
-<script src="assets/js/portal-auth-guard.js"></script>
-<script src="assets/js/admin-auth-guard.js?v=20260924-phase6"></script>
+
+
+
 <script src="assets/js/admin-lms-sidebar.js"></script>
 <script>
 (function(){
@@ -190,5 +190,12 @@ filter();
 </script>
 <script src="assets/js/enterprise-portal.js?v=20260924-design-v5"></script>
 <script src="assets/js/enterprise-training-directory.js?v=20260924-prod-ui-1"></script>
+
+<!-- screenings4u universal portal security -->
+<script src="assets/js/supabase-config.js?v=20260925-lockdown"></script>
+<script src="assets/js/core-auth.js?v=20260925-lockdown"></script>
+<script src="assets/js/session-security.js?v=20260925-lockdown"></script>
+<script src="assets/js/portal-auth-guard.js?v=20260925-lockdown"></script>
+<script src="assets/js/admin-auth-guard.js?v=20260925-lockdown"></script>
 </body>
 </html>

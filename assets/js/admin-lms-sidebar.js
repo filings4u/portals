@@ -456,6 +456,11 @@ bindUserDropdown();
           icon: "document"
         },
         {
+          label: "Intake Documents",
+          href: "intake-documents.html",
+          icon: "document"
+        },
+        {
           label: "Task Manager",
           href: "admin-tasks.html",
           icon: "clipboard"

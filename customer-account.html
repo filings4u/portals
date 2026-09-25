@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" class="s4u-auth-pending">
+<head><style id="s4u-preauth-style">html.s4u-auth-pending body{visibility:hidden!important}html.s4u-auth-pending #s4u-auth-blocking-error{visibility:visible!important}</style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#24467f">
@@ -47,7 +47,7 @@
   class="customer-account-page"
   data-page-title="My Account"
   data-page-subtitle="Manage your personal information and account preferences."
->
+ data-s4u-portal="customer">
 
   <div id="customer-portal-sidebar"></div>
 
@@ -442,15 +442,22 @@
 
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="assets/js/supabase-config.js"></script>
-<script src="assets/js/core-auth.js"></script>
+
+
 <script src="assets/js/ui.js?v=20260918-modal-fix-1"></script>
-<script src="assets/js/session-security.js"></script>
-<script src="assets/js/portal-auth-guard.js"></script>
-<script src="assets/js/customer-auth-guard.js"></script>
+
+
+
 
 <script src="assets/js/customer-portal.js"></script>
   <script src="assets/js/customer-account.js?v=20260830-0700"></script>
 
+
+<!-- screenings4u universal portal security -->
+<script src="assets/js/supabase-config.js?v=20260925-lockdown"></script>
+<script src="assets/js/core-auth.js?v=20260925-lockdown"></script>
+<script src="assets/js/session-security.js?v=20260925-lockdown"></script>
+<script src="assets/js/portal-auth-guard.js?v=20260925-lockdown"></script>
+<script src="assets/js/customer-auth-guard.js?v=20260925-lockdown"></script>
 </body>
 </html>
