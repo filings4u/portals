@@ -75,7 +75,8 @@
     user: EMPTY_STATE.user,
     profile: EMPTY_STATE.profile,
     roles: [],
-    primaryRole: EMPTY_STATE.primaryRole
+    primaryRole: EMPTY_STATE.primaryRole,
+    adminContext: null
   };
 
   function getClient() {
@@ -154,7 +155,8 @@
       user: null,
       profile: null,
       roles: [],
-      primaryRole: null
+      primaryRole: null,
+      adminContext: null
     };
   }
 
@@ -272,11 +274,14 @@
       );
     }
 
-    return Boolean(
+    const allowed = Boolean(
       data?.profile?.employment_status === "active" &&
       Array.isArray(data?.role_codes) &&
       data.role_codes.length
     );
+
+    state.adminContext = allowed ? data : null;
+    return allowed;
   }
 
   async function verifyTrainingAccess() {
@@ -465,13 +470,6 @@
       portalConfig?.login ||
       "customer-login.html";
 
-    const session = await getSession();
-
-    if (!session?.access_token) {
-      window.location.replace(destination);
-      return null;
-    }
-
     let authState;
 
     try {
@@ -488,7 +486,7 @@
       return null;
     }
 
-    if (!authState.user?.id) {
+    if (!authState.session?.access_token || !authState.user?.id) {
       window.location.replace(destination);
       return null;
     }
@@ -515,6 +513,10 @@
       await signOutSilently();
       window.location.replace(destination);
       return null;
+    }
+
+    if (portalConfig.name === "admin" && state.adminContext) {
+      authState.adminContext = state.adminContext;
     }
 
     return authState;

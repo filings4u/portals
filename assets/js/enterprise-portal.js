@@ -185,6 +185,11 @@ async function loadContext(){
  try{
   const authState=await waitForVerifiedAdmin();
   if(!authState?.user?.id)return;
+  if(authState.adminContext?.user){
+   const data=authState.adminContext;
+   state.ctx={...data,super_admin:data.is_super_admin,product_access:data.products||data.product_access||[]};
+   return;
+  }
   const sb=window.screenings4uSupabase;
   if(!sb?.functions)return;
   const {data,error}=await sb.functions.invoke('screenings4u-staff-context',{body:{action:'context'}});
