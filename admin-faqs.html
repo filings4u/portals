@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html class="s4u-auth-pending" lang="en">
-<head><style id="s4u-preauth-style">html.s4u-auth-pending body{visibility:hidden!important}html.s4u-auth-pending #s4u-auth-blocking-error{visibility:visible!important}</style>
+<head><style id="s4u-preauth-style">@keyframes s4uAuthSpin{to{transform:rotate(360deg)}}html.s4u-auth-pending body>:not(#s4u-auth-blocking-error):not(#s4u-auth-loading){visibility:hidden!important}html.s4u-auth-pending #s4u-auth-blocking-error,html.s4u-auth-pending #s4u-auth-loading{visibility:visible!important}</style>
   <meta charset="UTF-8">
   <meta name="theme-color" content="#24467f">
 
@@ -16,21 +16,21 @@
 <link rel="stylesheet" href="assets/css/lms-ui-modals.css?v=20260918-modal-fix-1">
 <link rel="stylesheet" href="assets/css/brand-system.css?v=20260918-dashboard-fix-v1">
 <link rel="stylesheet" href="assets/css/enterprise-management-system.css?v=20260924-design-v5"></head>
-<body data-s4u-portal="admin">
+<body data-s4u-portal="admin"><div id="s4u-auth-loading" role="status" aria-live="polite" style="position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;background:#f4f7fc;font-family:Inter,Arial,sans-serif;color:#24467f"><div style="text-align:center"><div style="width:34px;height:34px;margin:0 auto 14px;border:3px solid #dbe5f1;border-top-color:#24467f;border-radius:50%;animation:s4uAuthSpin .7s linear infinite"></div><strong style="font-size:14px">Loading secure workspace…</strong></div></div>
   <div class="admin-lms-app"><div id="admin-lms-sidebar-target"></div><main class="admin-lms-main"><header class="admin-lms-topbar"><div class="admin-lms-topbar-left"><button type="button" class="admin-lms-sidebar-collapse" data-admin-sidebar-collapse aria-label="Collapse sidebar" aria-expanded="true"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg></button><div class="admin-lms-page-context"><small>screenings4u Management Portal</small><strong>FAQ Management</strong></div></div><div class="admin-lms-topbar-right"><a href="admin-faqs.html" target="_blank" class="admin-lms-icon-button" aria-label="View public FAQ page"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></a></div></header>
     <section class="faq-admin-page"><div class="faq-admin-header"><div><small>Website Content</small><h1>Frequently Asked Questions</h1><p>Create, publish, organize, and control where FAQ answers appear.</p></div><button type="button" class="faq-primary" id="addFaqButton">+ Create FAQ</button></div>
       <div class="faq-stats"><div class="faq-stat"><span>Total FAQs</span><strong id="faqStatTotal">0</strong></div><div class="faq-stat"><span>Published</span><strong id="faqStatPublished">0</strong></div><div class="faq-stat"><span>Draft / Review</span><strong id="faqStatDraft">0</strong></div><div class="faq-stat"><span>Featured</span><strong id="faqStatFeatured">0</strong></div></div>
       <div class="faq-panel"><div class="faq-toolbar"><input id="faqAdminSearch" type="search" placeholder="Search question, category, or tag..."><select id="faqAdminStatus"><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Draft</option><option value="review">Review</option><option value="archived">Archived</option></select></div><div class="faq-admin-loading" id="faqAdminLoading">Loading FAQs...</div><div class="faq-admin-rows" id="faqAdminRows"></div><div class="faq-admin-empty" id="faqAdminEmpty" hidden>No FAQs match the selected filters.</div></div>
     </section></main></div>
   <div class="faq-modal" id="faqEditor" aria-hidden="true"><div class="faq-modal-card" role="dialog" aria-modal="true" aria-labelledby="faqEditorTitle"><div class="faq-modal-header"><h2 id="faqEditorTitle">Create FAQ</h2><button type="button" class="faq-close" id="faqEditorClose" aria-label="Close">×</button></div><form class="faq-form" id="faqForm"><div class="faq-form-grid"><div class="faq-field full"><label for="faqQuestion">Question</label><input id="faqQuestion" required></div><div class="faq-field"><label for="faqSlug">URL Slug</label><input id="faqSlug" placeholder="Generated from question"></div><div class="faq-field"><label for="faqCategory">Category</label><input id="faqCategory" list="faqCategoryOptions" required><datalist id="faqCategoryOptions"><option value="Ordering"><option value="Collection Sites"><option value="Results"><option value="DOT Testing"><option value="Employer Services"><option value="Training"><option value="Support"></datalist></div><div class="faq-field full"><label for="faqAnswer">Answer (basic HTML allowed)</label><textarea id="faqAnswer" required placeholder="<p>Enter the answer...</p>"></textarea></div><div class="faq-field"><label for="faqTags">Tags</label><input id="faqTags" placeholder="DOT, testing, results"></div><div class="faq-field"><label for="faqStatus">Status</label><select id="faqStatus"><option value="draft">Draft</option><option value="review">Review</option><option value="published">Published</option><option value="archived">Archived</option></select></div><div class="faq-field"><label for="faqSortOrder">Sort Order</label><input id="faqSortOrder" type="number" min="0" step="1"></div><div class="faq-field full"><label>Visibility</label><div class="faq-checks"><label><input id="faqFeatured" type="checkbox"> Featured</label><label><input id="faqShowWebsite" type="checkbox"> Website</label><label><input id="faqShowCustomer" type="checkbox"> Customer Portal</label><label><input id="faqShowEmployer" type="checkbox"> Employer Portal</label></div></div></div><div class="faq-modal-actions"><button type="button" class="faq-cancel" id="faqEditorCancel">Cancel</button><button type="submit" class="faq-primary" id="faqSaveButton">Save FAQ</button></div></form></div></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="assets/js/enterprise-management-system.js?v=20260924-design-v5"></script><script src="assets/js/ui.js?v=20260918-modal-fix-1"></script><script src="assets/js/admin-faqs.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-config.js?v=20260925-fast-auth"></script>
+<script src="assets/js/core-auth.js?v=20260925-fast-auth"></script>
+<script src="assets/js/session-security.js?v=20260925-fast-auth"></script>
+<script src="assets/js/portal-auth-guard.js?v=20260925-fast-auth"></script>
+<script src="assets/js/admin-auth-guard.js?v=20260925-fast-auth"></script><script src="assets/js/enterprise-management-system.js?v=20260924-design-v5"></script><script src="assets/js/ui.js?v=20260918-modal-fix-1"></script><script src="assets/js/admin-faqs.js"></script>
 <script src="assets/js/enterprise-portal.js?v=20260924-design-v5"></script>
 
 <!-- screenings4u universal portal security -->
-<script src="assets/js/supabase-config.js?v=20260925-lockdown"></script>
-<script src="assets/js/core-auth.js?v=20260925-lockdown"></script>
-<script src="assets/js/session-security.js?v=20260925-lockdown"></script>
-<script src="assets/js/portal-auth-guard.js?v=20260925-lockdown"></script>
-<script src="assets/js/admin-auth-guard.js?v=20260925-lockdown"></script>
 </body>
 </html>

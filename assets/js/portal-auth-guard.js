@@ -28,8 +28,9 @@
     const style = document.createElement("style");
     style.id = "s4u-auth-guard-styles";
     style.textContent =
-      "html.s4u-auth-pending body > :not(#s4u-auth-blocking-error){visibility:hidden!important;}" +
-      "html.s4u-auth-pending #s4u-auth-blocking-error{visibility:visible!important;}";
+      "html.s4u-auth-pending body > :not(#s4u-auth-blocking-error):not(#s4u-auth-loading){visibility:hidden!important;}" +
+      "html.s4u-auth-pending #s4u-auth-blocking-error,html.s4u-auth-pending #s4u-auth-loading{visibility:visible!important;}" +
+      "html.s4u-authenticated #s4u-auth-loading{display:none!important;visibility:hidden!important;pointer-events:none!important;}";
     document.head.appendChild(style);
   }
 
@@ -54,6 +55,12 @@
 
   function markAuthenticated(state) {
     const root = document.documentElement;
+    const loading = document.getElementById("s4u-auth-loading");
+    if (loading) {
+      loading.style.pointerEvents = "none";
+      loading.style.display = "none";
+      loading.remove();
+    }
 
     root.classList.remove(
       "s4u-auth-pending",

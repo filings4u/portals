@@ -320,3 +320,7 @@ body.ep-enterprise-shell .s4u-route-body{padding:18px!important}
   body.ep-enterprise-shell .admin-lms-main>.courses-page,
   body.ep-enterprise-shell .admin-lms-main>.media-page{padding:16px!important}
 }
+
+/* Functional management panels: hidden until page code opens them. */
+.ecp-route-panel.open,.ecp-route-panel.active,.ecp-route-panel.show{position:fixed!important;inset:0!important;z-index:10000!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important;background:rgba(16,29,47,.5)!important;box-sizing:border-box!important}
+.ecp-route-panel.open>.ecp-dialog,.ecp-route-panel.active>.ecp-dialog,.ecp-route-panel.show>.ecp-dialog{display:block!important}

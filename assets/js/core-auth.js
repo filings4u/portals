@@ -75,8 +75,7 @@
     user: EMPTY_STATE.user,
     profile: EMPTY_STATE.profile,
     roles: [],
-    primaryRole: EMPTY_STATE.primaryRole,
-    adminContext: null
+    primaryRole: EMPTY_STATE.primaryRole
   };
 
   function getClient() {
@@ -155,8 +154,7 @@
       user: null,
       profile: null,
       roles: [],
-      primaryRole: null,
-      adminContext: null
+      primaryRole: null
     };
   }
 
@@ -274,14 +272,11 @@
       );
     }
 
-    const allowed = Boolean(
+    return Boolean(
       data?.profile?.employment_status === "active" &&
       Array.isArray(data?.role_codes) &&
       data.role_codes.length
     );
-
-    state.adminContext = allowed ? data : null;
-    return allowed;
   }
 
   async function verifyTrainingAccess() {
@@ -470,6 +465,55 @@
       portalConfig?.login ||
       "customer-login.html";
 
+    const session = await getSession();
+
+    if (!session?.access_token) {
+      window.location.replace(destination);
+      return null;
+    }
+
+    /*
+     * Admin fast path: screenings4u-staff-context already validates the JWT,
+     * active staff profile, active staff roles, permissions, and business
+     * access server-side. Reusing that one request avoids the old sequence of
+     * getUser + user_profiles + portal roles + staff-context before the page
+     * could become visible.
+     */
+    if (portalConfig?.name === "admin") {
+      try {
+        const client = getClient();
+        const { data, error } = await client.functions.invoke(
+          "screenings4u-staff-context",
+          { body: { action: "context" } }
+        );
+
+        if (error || data?.error || !data?.user?.id) {
+          throw new Error(
+            data?.error || error?.message ||
+            "Active screenings4u staff access is required."
+          );
+        }
+
+        window.S4UAdminContext = data;
+        state = {
+          initialized: true,
+          session,
+          user: data.user,
+          profile: data.profile || null,
+          roles: uniqueRoles(data.role_codes || []),
+          primaryRole: "admin"
+        };
+
+        return cloneState();
+      } catch (error) {
+        console.error("[S4UAuth] Administrator verification failed:", error);
+        try { await getClient().auth.signOut({ scope: "local" }); } catch {}
+        clearState(true);
+        window.location.replace(destination);
+        return null;
+      }
+    }
+
     let authState;
 
     try {
@@ -486,7 +530,7 @@
       return null;
     }
 
-    if (!authState.session?.access_token || !authState.user?.id) {
+    if (!authState.user?.id) {
       window.location.replace(destination);
       return null;
     }
@@ -513,10 +557,6 @@
       await signOutSilently();
       window.location.replace(destination);
       return null;
-    }
-
-    if (portalConfig.name === "admin" && state.adminContext) {
-      authState.adminContext = state.adminContext;
     }
 
     return authState;

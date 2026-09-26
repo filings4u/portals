@@ -95,26 +95,21 @@
         return { allowed: true, role: allowedRole, profile };
       }
 
-      async function redirectIfAlreadySignedIn() {
+      async function resetLoginState() {
         try {
           const client = getSupabaseClient();
-          const { data, error } = await client.auth.getSession();
-          if (error) return;
-
-          const session = data && data.session;
-          if (!session || !session.user) return;
-
-          const access = await getAdminAccess(client, session.user.id);
-
-          if (access.allowed) {
-            window.location.replace("admin-dashboard.html");
-            return;
-          }
-
+          // The administrator login page must always start from a clean local
+          // state. Never auto-redirect an existing/stale session back to the
+          // dashboard; that behavior can create a login <-> dashboard loop.
           await client.auth.signOut({ scope: "local" });
         } catch (error) {
-          console.error("Admin login session check failed:", error);
+          console.warn("Admin login state reset warning:", error);
         }
+
+        try {
+          sessionStorage.removeItem("s4u-security-last-activity-v2");
+          localStorage.removeItem("s4u-security-last-activity-v2");
+        } catch (_) {}
       }
 
       $("passwordToggle").addEventListener("click", () => {
@@ -233,6 +228,13 @@ $("forgotPasswordBtn").addEventListener("click", async () => {
 
           showStatus("Access verified. Opening admin console...", "success");
 
+          // Establish a fresh inactivity baseline before entering the
+          // protected portal so the new login cannot be treated as stale.
+          try {
+            localStorage.setItem("s4u-security-last-activity-v2", String(Date.now()));
+            sessionStorage.setItem("s4u-security-last-activity-v2", String(Date.now()));
+          } catch (_) {}
+
           window.location.replace("admin-dashboard.html");
 
         } catch (error) {
@@ -249,5 +251,5 @@ $("forgotPasswordBtn").addEventListener("click", async () => {
         }
       });
 
-      redirectIfAlreadySignedIn();
+      resetLoginState();
     })();
