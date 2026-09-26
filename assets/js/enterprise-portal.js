@@ -43,9 +43,9 @@ const modules={
   ['Work Management',[
    ['admin-work-management.html','Task Manager','schedule']]],
   ['Commerce & Service',[
-   ['admin-catalog-management.html','Global Catalog Governance','services'],['admin-service-desk.html','Service Desk Management','help'],['admin-forms.html','Forms Management','docs'],['admin-intake-documents.html','Intake Documents','docs']]],
+   ['admin-catalog-management.html','Global Catalog Governance','services'],['admin-service-desk.html','Service Desk Management','help'],['admin-intake-documents.html','Intake Documents','docs']]],
   ['Governance',[
-   ['admin-security-access.html','Security & Access','audit'],['admin-legacy-routes.html','Portal Routes','tech']]]]},
+   ['admin-legacy-routes.html','Portal Routes','tech']]]]},
  testing:{label:'Testing',landing:'admin-testing-command-center.html',product:'screenings4u',groups:[
   ['Testing Command Center',[
    ['admin-testing-command-center.html','Testing Overview'],['admin-testing-command-center.html?tab=cases','Testing Cases'],['admin-testing-command-center.html?tab=orders','Testing Orders'],['admin-testing-command-center.html?tab=schedule','Collection Schedule'],['admin-testing-command-center.html?tab=results','Results'],['admin-testing-command-center.html?tab=providers','Provider Network'],['admin-testing-command-center.html?tab=customers','Testing Customers']]],
@@ -64,7 +64,7 @@ const modules={
   ['Programs & Testing',[
    ['admin-operations-command-center.html?business=workforce&tab=programs','Program Operations','operations'],['admin-workforce-programs.html','Non-DOT Programs'],['admin-workforce-pools.html','Consortiums & Random Pools'],['admin-workforce-pool-members.html','Pool Memberships'],['admin-workforce-selections.html','Random Selections'],['admin-workforce-testing.html','Testing Orders'],['admin-workforce-results.html','Results']]],
   ['Customer Configuration',[
-   ['admin-workforce-catalog.html','Storefront, Plans & Pricing','services'],['admin-customer-setup.html?business=workforce&tab=manage','Locations'],['admin-customer-setup.html?business=workforce&tab=manage','Branding'],['admin-customer-setup.html?business=workforce&tab=manage','Integrations'],['admin-customer-setup.html?business=workforce&tab=manage','Consents & Acknowledgments'],['admin-customer-setup.html?business=workforce&tab=manage','Credentials']]],
+   ['admin-workforce-catalog.html','Storefront, Plans & Pricing','services'],['admin-customer-setup.html?business=workforce&tab=manage','Locations'],['admin-customer-setup.html?business=workforce&tab=manage','Branding'],['admin-customer-setup.html?business=workforce&tab=manage','Consents & Acknowledgments'],['admin-customer-setup.html?business=workforce&tab=manage','Credentials']]],
   ['Operations & Compliance',[
    ['admin-workforce-catalog.html?view=services','Service Configuration'],['admin-workforce-compliance.html','Compliance Cases'],['admin-customer-setup.html?business=workforce&tab=manage','Policies'],['admin-workforce-training.html','Training Records'],['admin-workforce-reports.html','Reports']]]]},
  dot:{label:'DOT',landing:'admin-organizations.html?business=dot&type=ctpa',product:'dot',groups:[
@@ -73,7 +73,7 @@ const modules={
   ['Programs & Randoms',[
    ['admin-operations-command-center.html?business=dot&tab=programs','Program Operations','operations'],['admin-dot-programs.html','DOT Programs'],['admin-dot-consortiums.html','Consortiums'],['admin-dot-pools.html','Random Pools'],['admin-dot-pool-members.html','Pool Memberships'],['admin-dot-selections.html','Random Selections'],['admin-dot-testing.html','Testing Orders'],['admin-dot-results.html','Results'],['admin-dot-post-accident.html','Post-Accident']]],
   ['Customer Configuration',[
-   ['admin-dot-catalog.html','Storefront, Plans & Pricing','services'],['admin-dot-catalog.html?view=pricing','C/TPA Test Pricing'],['admin-dot-users.html','Users & Roles'],['admin-customer-setup.html?business=dot&tab=manage','Locations'],['admin-customer-setup.html?business=dot&tab=manage','Branding'],['admin-customer-setup.html?business=dot&tab=manage','Integrations'],['admin-customer-setup.html?business=dot&tab=manage','Consents & Acknowledgments'],['admin-customer-setup.html?business=dot&tab=manage','Credentials'],['admin-dot-training.html','Training Records']]],
+   ['admin-dot-catalog.html','Storefront, Plans & Pricing','services'],['admin-dot-catalog.html?view=pricing','C/TPA Test Pricing'],['admin-dot-users.html','Users & Roles'],['admin-customer-setup.html?business=dot&tab=manage','Locations'],['admin-customer-setup.html?business=dot&tab=manage','Branding'],['admin-customer-setup.html?business=dot&tab=manage','Consents & Acknowledgments'],['admin-customer-setup.html?business=dot&tab=manage','Credentials'],['admin-dot-training.html','Training Records']]],
   ['Agency Management',[
    ['admin-dot-fmcsa.html','FMCSA'],['admin-dot-faa.html','FAA'],['admin-dot-fra.html','FRA'],['admin-dot-fta.html','FTA'],['admin-dot-phmsa.html','PHMSA'],['admin-dot-uscg.html','USCG']]],
   ['Regulatory Operations',[
@@ -92,9 +92,7 @@ const explicit={
  'admin-finance-ar.html':'finance','admin-finance-ap.html':'finance','admin-finance-invoices.html':'finance','admin-finance-accounting.html':'finance','admin-finance-statements.html':'finance','admin-finance-orders.html':'finance','admin-invoices.html':'finance','admin-invoice.html':'finance','admin-checkout.html':'finance','admin-discounts.html':'finance','admin-revenue-service-management.html':'finance'
 };
 const navAliases={
- 'admin-form-editor.html':'admin-forms.html',
- 'admin-form-submissions.html':'admin-forms.html',
- 'admin-form-submission.html':'admin-forms.html',
+ 'admin-audit-event.html':'admin-audit.html',
  'admin-testing.html':'admin-testing-command-center.html',
  'admin-testing-case.html':'admin-testing-command-center.html',
  'admin-testing-cases.html':'admin-testing-command-center.html',
@@ -125,7 +123,9 @@ const navAliases={
  'admin-customer-chat.html':'admin-work-management.html',
  'admin-internal-chat.html':'admin-work-management.html',
  'admin-tasks.html':'admin-work-management.html',
- 'admin-crm.html':'admin-security-access.html',
+ 'admin-crm.html':'admin-people.html',
+ 'admin-security-access.html':'admin-people.html',
+ 'admin-staff.html':'admin-people.html',
  'admin-customer-crm.html':'admin-access.html',
  'admin-employer-crm.html':'admin-organizations.html',
  'admin-lms-dashboard.html':'admin-lms-courses.html',
@@ -137,7 +137,11 @@ const navAliases={
  'admin-workforce-employee.html':'admin-workforce-employees.html',
  'admin-dot.html':'admin-dot-ctpas.html',
  'admin-invoice.html':'admin-finance-invoices.html',
- 'admin-invoices.html':'admin-finance-invoices.html'
+ 'admin-invoices.html':'admin-finance-invoices.html',
+ 'admin-service-desk-ticket.html':'admin-service-desk.html',
+ 'admin-service-desk-communication.html':'admin-service-desk.html',
+ 'admin-service-desk-document.html':'admin-service-desk.html',
+ 'admin-service-desk-activity.html':'admin-service-desk.html'
 };
 function activeNavPage(){return navAliases[page]||page}
 function moduleForPage(){
@@ -145,7 +149,7 @@ function moduleForPage(){
  if(page==='admin-customer-assignments.html')return queryBusiness==='dot'?'dot':(queryBusiness==='workforce'?'workforce':'enterprise');
  const shared=new Set(['admin-organizations.html','admin-organization.html','admin-customer-operations.html','admin-organization-operations.html','admin-customer-setup.html','admin-compliance-command-center.html','admin-agency-workforce-management.html','admin-work-management.html','admin-people.html','admin-person.html','admin-access.html','admin-service-desk.html']);
  if(shared.has(page)&&['testing','training','workforce','dot'].includes(queryBusiness))return queryBusiness;
- if(page==='admin-dashboard.html'||['admin-security-access.html','admin-legacy-routes.html','admin-staff.html','admin-customer-assignments.html','admin-audit.html','admin-global-settings.html','admin-technology.html','admin-enterprise-search.html','admin-intake-documents.html'].includes(page))return 'enterprise';
+ if(page==='admin-dashboard.html'||['admin-security-access.html','admin-legacy-routes.html','admin-staff.html','admin-customer-assignments.html','admin-audit.html','admin-audit-event.html','admin-global-settings.html','admin-technology.html','admin-integration.html','admin-enterprise-search.html','admin-intake-documents.html'].includes(page))return 'enterprise';
  if(page==='admin-testing-command-center.html')return 'testing';
  if(explicit[page])return explicit[page];
  if(page.startsWith('admin-lms-'))return 'training';
@@ -159,20 +163,18 @@ function escapeHtml(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','
 function initials(v='Administrator'){return String(v).split(/[\s._@-]+/).filter(Boolean).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'A'}
 function visibleModules(){const c=state.ctx,prods=new Set((c?.product_access||[]).map(x=>x.product_code));return Object.entries(modules).filter(([key,m])=>{if(c?.super_admin)return true;if(c&&['screenings4u','training','workforce','dot'].includes(m.product)&&!prods.has(m.product))return false;return !m.permission||m.permission(c)})}
 const adminItems=[
- ['admin-staff.html','Staff Directory','staff'],
  ['admin-audit.html','Audit Log','audit'],
- ['admin-global-settings.html','System Settings','settings'],
- ['admin-technology.html','Technology & Integrations','tech']
+ ['admin-technology.html','Integration Management','tech']
 ];
 const moduleIcons={enterprise:'home',testing:'testing',training:'training',workforce:'workforce',dot:'dot',finance:'finance'};
 function navItem([href,label,icon],activeModule){const active=activeNavPage()===String(href).split('?')[0];const ic=icon||moduleIcons[activeModule]||'home';return `<a class="ep-side-link ${active?'active':''}" href="${href}"${active?' aria-current="page"':''}><span class="ep-side-icon">${ICONS[ic]||ICONS.home}</span><span>${escapeHtml(label)}</span></a>`}
-function canSeeAdminItem(href){const c=state.ctx;if(!c||c.super_admin)return true;const perms=new Set(c.permissions||[]);if(href==='admin-security-access.html')return perms.has('staff.roles.view')||perms.has('staff.product_access.view')||perms.has('audit.view');if(href==='admin-staff.html')return perms.has('staff.directory.view');if(href==='admin-customer-assignments.html')return perms.has('customers.assign')||perms.has('customers.view_assigned')||perms.has('customers.view_all');if(href==='admin-audit.html')return perms.has('audit.view');if(href==='admin-service-desk.html'||href==='admin-support-tickets.html')return perms.has('support.view')||perms.has('support.manage')||perms.has('audit.view');if(href==='admin-legacy-routes.html')return perms.has('developer.tools')||perms.has('integrations.view')||perms.has('audit.view');if(href==='admin-global-settings.html')return false;if(href==='admin-technology.html')return perms.has('integrations.view')||perms.has('integrations.manage')||perms.has('developer.tools');return true}
+function canSeeAdminItem(href){const c=state.ctx;if(!c||c.super_admin)return true;const perms=new Set(c.permissions||[]);if(href==='admin-customer-assignments.html')return perms.has('customers.assign')||perms.has('customers.view_assigned')||perms.has('customers.view_all');if(href==='admin-audit.html')return perms.has('audit.view');if(href==='admin-service-desk.html'||href==='admin-support-tickets.html')return perms.has('support.view')||perms.has('support.manage')||perms.has('audit.view');if(href==='admin-legacy-routes.html')return perms.has('developer.tools')||perms.has('integrations.view')||perms.has('audit.view');if(href==='admin-global-settings.html')return false;if(href==='admin-technology.html'||href==='admin-integration.html')return perms.has('integrations.view')||perms.has('integrations.manage')||perms.has('developer.tools');return true}
 function visibleAdminItems(){return adminItems.filter(([href])=>canSeeAdminItem(href))}
 function groupHasActive(links){const active=activeNavPage();return links.some(([href])=>String(href).split('?')[0]===active)}
 function sideGroup(title,links,key,forceOpen=false){const open=forceOpen||groupHasActive(links);return `<details class="ep-side-group" ${open?'open':''}><summary><span>${escapeHtml(title)}</span><i>${ICONS.chevron}</i></summary><div class="ep-side-section">${links.map(x=>navItem(x,key)).join('')}</div></details>`}
 function sidebar(){const key=moduleForPage(),m=modules[key]||modules.enterprise;const groups=m.groups||[],hasActive=groups.some(([,links])=>groupHasActive(links));const admin=key==='enterprise'?visibleAdminItems():[],adminActive=groupHasActive(admin);const adminHtml=admin.length?`<div class="ep-side-divider"></div>${sideGroup('Administration',admin,key,adminActive)}`:'';const homes={enterprise:['admin-dashboard.html','Executive Overview','home'],testing:['admin-testing-command-center.html','Testing Overview','testing'],training:['admin-lms-courses.html','Training Overview','training'],workforce:['admin-organizations.html?business=workforce&type=ctpa','Workforce Overview','workforce'],dot:['admin-organizations.html?business=dot&type=ctpa','DOT Overview','dot'],finance:['admin-finance-ar.html','Finance Overview','finance']};const home=homes[key]||homes.enterprise;return `<aside class="ep-sidebar"><div class="ep-brand"><a href="${m.landing}"><img src="images/logo2.png" alt="screenings4u"><span>Enterprise Management Portal</span></a></div><div class="ep-side-workspace"><span>Workspace</span><strong>${escapeHtml(m.label)}</strong></div><nav class="ep-side-scroll" aria-label="${escapeHtml(m.label)} management"><div class="ep-side-section ep-side-home">${navItem(home,key)}</div><div class="ep-side-divider"></div>${groups.map((g,i)=>sideGroup(g[0],g[1],key,!hasActive&&i===0)).join('')}${adminHtml}</nav><div class="ep-side-footer"><strong>screenings4u Enterprise</strong><span>${escapeHtml(m.label)} workspace</span></div></aside>`}
 function tabDropdown(key,m){const active=page!=='admin-dashboard.html'&&moduleForPage()===key;return `<div class="ep-biz-tab-wrap"><a class="ep-biz-tab ${active?'active':''}" href="${m.landing}"${active?' aria-current="page"':''}>${escapeHtml(m.label)}</a></div>`}
-function topbar(){const c=state.ctx,email=c?.user?.email||'Administrator',display=c?.profile?.display_name||c?.user?.user_metadata?.full_name||email.split('@')[0]||'Administrator',role=c?.roles?.[0]?.name||'Internal Staff';return `<div class="ep-top-brand"><button class="ep-mobile-menu" id="epMobileMenu" aria-label="Open navigation">${ICONS.menu}</button><div><strong>screenings4u Enterprise</strong><small>Business operations. One enterprise system.</small></div></div><nav class="ep-business-tabs" aria-label="Business platforms">${visibleModules().map(([k,m])=>tabDropdown(k,m)).join('')}</nav><div class="ep-top-actions"><a class="ep-top-icon" id="epSearchBtn" href="admin-enterprise-search.html" aria-label="Search" title="Search">${ICONS.search}</a><a class="ep-top-icon ep-notification-button" href="admin-notifications.html" aria-label="Notifications" title="Notifications">${ICONS.bell}<span class="ep-notify-dot" aria-hidden="true"></span></a><a class="ep-top-icon" id="epHelpBtn" href="admin-service-desk.html" aria-label="Service Desk" title="Service Desk">${ICONS.help}</a><div class="s4u-font-sizer" aria-label="Portal font size"><span>Text</span><button type="button" data-scale="0.85" aria-pressed="false" title="Smaller text">A−</button><button type="button" data-scale="0.92" aria-pressed="false" title="Default text">A</button><button type="button" data-scale="1" aria-pressed="false" title="Larger text">A+</button></div><div class="ep-user-menu"><button class="ep-user-toggle" id="epUserToggle"><span class="ep-avatar">${initials(display)}</span><span class="ep-user-copy"><strong>${escapeHtml(display)}</strong><small>${escapeHtml(role)}</small></span><span class="ep-user-caret">⌄</span></button><div class="ep-menu" id="epUserMenu"><div class="ep-menu-head"><div><strong>${escapeHtml(display)}</strong><small>${escapeHtml(email)}</small></div><button class="ep-menu-close" aria-label="Close">${ICONS.x}</button></div><a href="admin-security-access.html">Account & access</a><a href="admin-notifications.html">Notifications</a><a href="admin-service-desk.html">Service Desk</a><button data-ep-logout>Sign out</button></div></div></div>`}
+function topbar(){const c=state.ctx,email=c?.user?.email||'Administrator',display=c?.profile?.display_name||c?.user?.user_metadata?.full_name||email.split('@')[0]||'Administrator',role=c?.roles?.[0]?.name||'Internal Staff';return `<div class="ep-top-brand"><button class="ep-mobile-menu" id="epMobileMenu" aria-label="Open navigation">${ICONS.menu}</button><div><strong>screenings4u Enterprise</strong><small>Business operations. One enterprise system.</small></div></div><nav class="ep-business-tabs" aria-label="Business platforms">${visibleModules().map(([k,m])=>tabDropdown(k,m)).join('')}</nav><div class="ep-top-actions"><a class="ep-top-icon" id="epSearchBtn" href="admin-enterprise-search.html" aria-label="Search" title="Search">${ICONS.search}</a><a class="ep-top-icon ep-notification-button" href="admin-notifications.html" aria-label="Notifications" title="Notifications">${ICONS.bell}<span class="ep-notify-dot" aria-hidden="true"></span></a><a class="ep-top-icon" id="epHelpBtn" href="admin-service-desk.html" aria-label="Service Desk" title="Service Desk">${ICONS.help}</a><div class="s4u-font-sizer" aria-label="Portal font size"><span>Text</span><button type="button" data-scale="0.85" aria-pressed="false" title="Smaller text">A−</button><button type="button" data-scale="0.92" aria-pressed="false" title="Default text">A</button><button type="button" data-scale="1" aria-pressed="false" title="Larger text">A+</button></div><div class="ep-user-menu"><button class="ep-user-toggle" id="epUserToggle"><span class="ep-avatar">${initials(display)}</span><span class="ep-user-copy"><strong>${escapeHtml(display)}</strong><small>${escapeHtml(role)}</small></span><span class="ep-user-caret">⌄</span></button><div class="ep-menu" id="epUserMenu"><div class="ep-menu-head"><div><strong>${escapeHtml(display)}</strong><small>${escapeHtml(email)}</small></div><button class="ep-menu-close" aria-label="Close">${ICONS.x}</button></div><a href="admin-person.html?id=${encodeURIComponent(c?.user?.id||'')}">My identity & access</a><a href="admin-notifications.html">Notifications</a><a href="admin-service-desk.html">Service Desk</a><button data-ep-logout>Sign out</button></div></div></div>`}
 function render(){document.body.classList.add('ep-enterprise-shell');const side=$('#admin-lms-sidebar-target');if(side)side.innerHTML=sidebar();let top=$('.admin-lms-topbar');if(!top){top=document.createElement('header');top.className='admin-lms-topbar';$('.admin-lms-main')?.prepend(top)}if(top)top.innerHTML=topbar();window.S4UFontSizer?.refresh?.();overlays();wire();}
 function searchIndex(){const x=[];for(const [k,m] of Object.entries(modules))for(const [group,links] of m.groups)for(const [href,label] of links)x.push({href,label,group,module:m.label});for(const [href,label] of visibleAdminItems())if(!x.some(i=>i.href===href))x.push({href,label,group:'Administration',module:'Enterprise'});return x}
 function overlays(){if(!$('.ep-overlay'))document.body.insertAdjacentHTML('beforeend','<div class="ep-overlay" id="epOverlay"></div>')}
