@@ -363,12 +363,43 @@
 
 
   async function loadQuizEditState() {
+    /*
+     * The edit-state RPC provides history/attempt metadata, but it must not
+     * make the Quiz Builder unusable if PostgREST is briefly refreshing its
+     * schema cache after a deployment. Direct editing remains protected by
+     * the LMS table RLS policies.
+     */
     const { data, error } = await state.client.rpc(
       "enterprise_training_quiz_edit_state",
       { p_quiz_id: state.quizId }
     );
-    if (error) throw error;
-    state.editState = data || null;
+
+    if (error) {
+      const message = String(error.message || error.details || "");
+      const schemaCacheMiss =
+        /schema cache/i.test(message) ||
+        /could not find the function/i.test(message) ||
+        error.code === "PGRST202";
+
+      if (!schemaCacheMiss) throw error;
+
+      console.warn(
+        "[Quiz Builder] Edit-state metadata is temporarily unavailable; continuing with direct LMS editing.",
+        error
+      );
+
+      state.editState = {
+        quiz_id: state.quizId,
+        lesson_id: state.lessonId,
+        course_id: state.courseId,
+        locked: false,
+        direct_edit_enabled: true,
+        metadata_unavailable: true
+      };
+      return;
+    }
+
+    state.editState = data || { locked: false, direct_edit_enabled: true };
   }
 
   async function offerSafeRevision() {

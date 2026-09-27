@@ -203,6 +203,7 @@ bindUserDropdown();
         { label: "Learners", href: "admin-lms-students.html", icon: "users" },
         { label: "Employer Sponsorships", href: "admin-lms-sponsorships.html", icon: "building" },
         { label: "Enrollments", href: "admin-lms-enrollments.html", icon: "clipboard" },
+        { label: "Create Training Order", href: "admin-lms-order-create.html", icon: "invoice" },
         { label: "Create Course", href: "admin-lms-creation.html", icon: "course" },
         { label: "Courses", href: "admin-lms-courses.html", icon: "book" },
         { label: "Quizzes", href: "admin-lms-quizzes.html", icon: "quiz" },

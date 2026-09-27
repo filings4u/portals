@@ -60,10 +60,9 @@
         params.get("id") ||
         "";
 
-      if (!state.courseId) {
-        throw new Error(
-          "Open Engagement from a course record so the course ID is available."
-        );
+      if (!state.courseId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(state.courseId)) {
+        window.location.replace("admin-lms-courses.html?engagement=select-course");
+        return;
       }
 
       applyLinks();
@@ -935,6 +934,19 @@
           state.courseId
         );
     }
+
+    const scopedLinks = [
+      ["engagementAutomationManageButton", "admin-email-marketing.html"],
+      ["engagementAssessmentsButton", "admin-lms-quizzes.html"]
+    ];
+
+    scopedLinks.forEach(([id, page]) => {
+      const link = $(id);
+      if (!link) return;
+      const url = new URL(page, window.location.href);
+      url.searchParams.set("course", state.courseId);
+      link.href = url.pathname + url.search;
+    });
   }
 
 

@@ -1743,3 +1743,59 @@
   .settings-modal > footer { flex-direction: column-reverse; }
   .settings-modal > footer .settings-pill { width: 100%; }
 }
+
+/* ============================================================
+   #8 COURSE SETTINGS — TRAINING PORTAL TYPOGRAPHY + CONSISTENCY
+   Final override: keep the course workspace on the same readable
+   scale as the rest of the Training business portal.
+   ============================================================ */
+.admin-lms-course-settings-page,
+.admin-lms-course-settings-page button,
+.admin-lms-course-settings-page input,
+.admin-lms-course-settings-page select,
+.admin-lms-course-settings-page textarea {
+  font-family: Inter, Arial, sans-serif;
+}
+
+.admin-lms-course-settings-page {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.admin-lms-course-settings-page *,
+.admin-lms-course-settings-page *::before,
+.admin-lms-course-settings-page *::after {
+  box-sizing: border-box;
+}
+
+.settings-breadcrumbs { font-size: 13px; }
+.settings-course-header h1 { font-size: clamp(28px, 2.4vw, 36px); }
+.settings-status-badge { font-size: 12px; padding: 4px 9px; border-radius: 999px; }
+.settings-pill { font-size: 14px; min-height: 40px; }
+.settings-course-tabs a { font-size: 14px; font-weight: 700; }
+.settings-toast,
+.settings-loading { font-size: 14px; }
+.settings-card h2,
+.settings-automation-card h2 { font-size: 16px; }
+.settings-card header p,
+.settings-automation-card p { font-size: 13px; }
+.settings-edit { font-size: 13px; font-weight: 800; }
+.settings-row span { font-size: 14px; }
+.settings-row strong { font-size: 15px; }
+.settings-card-note { font-size: 13px; line-height: 1.55; }
+.settings-modal header small { font-size: 11px; }
+.settings-modal h2 { font-size: 21px; }
+.settings-modal-body label > span { font-size: 14px; font-weight: 700; }
+.settings-modal input,
+.settings-modal select,
+.settings-modal textarea,
+.settings-rich-editor-surface { font-size: 15px !important; }
+.settings-check span { font-size: 14px !important; }
+
+@media (max-width: 760px) {
+  .settings-workspace { padding: 18px 16px 40px; }
+  .settings-course-header { align-items: stretch; }
+  .settings-header-actions { flex-wrap: wrap; }
+  .settings-course-tabs { overflow-x: auto; }
+  .settings-course-tabs a { white-space: nowrap; }
+}

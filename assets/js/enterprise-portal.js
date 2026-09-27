@@ -59,15 +59,15 @@ const modules={
   ['Learner Management',[
    ['admin-lms-enrollments.html','Enrollments'],['admin-lms-progress.html','Learner Progress'],['admin-lms-documents.html','Learner Documents','docs'],['admin-lms-certificates.html','Certificates','docs']]],
   ['Course Management',[
-   ['admin-lms-courses.html','Courses'],['admin-lms-creation.html','Create Course'],['admin-lms-quizzes.html','Quizzes'],['admin-lms-video.html','Media'],['admin-lms-course-engagement.html','Course Engagement']]],
+   ['admin-lms-courses.html','Courses'],['admin-lms-creation.html','Create Course'],['admin-lms-quizzes.html','Quizzes'],['admin-lms-video.html','Media']]],
   ['Storefront & Commerce',[
-   ['admin-lms-storefront.html','Storefront & Pricing','services'],['admin-lms-orders.html','Training Orders','orders'],['admin-lms-group-seats.html','Group Training Seats','training']]],
+   ['admin-lms-storefront.html','Storefront & Pricing','services'],['admin-lms-orders.html','Training Orders','orders'],['admin-lms-order-create.html','Create Training Order','training'],['admin-lms-group-seats.html','Group Training Seats','training']]],
   ['Operations & Reporting',[
    ['admin-lms-reports.html','Reports','audit']]],
   ['Company Administration',[
-   ['admin-lms-organizations.html?business=training','Organizations & Accounts','crm'],['admin-lms-people.html?business=training','People & Identity','staff'],['admin-lms-access.html?business=training','Portal Users & Access','user'],['admin-lms-customer-setup.html?business=training','Customer Setup & Configuration','settings'],['admin-lms-tasks.html','Task Manager','schedule']]],
+   ['admin-lms-tasks.html','Task Manager','schedule']]],
   ['Business Administration',[
-   ['admin-lms-settings.html','Settings','settings'],['admin-lms-support.html','Support','help'],['admin-lms-billing.html','Billing & Receivables','finance'],['admin-lms-invoices.html','Invoicing','finance'],['admin-lms-notifications.html?business=training','Notifications','bell']]]]},
+   ['admin-lms-settings.html','Settings','settings'],['admin-lms-support.html','Support','help'],['admin-lms-billing.html','Billing & Invoicing','finance'],['admin-lms-notifications.html?business=training','Notifications','bell']]]]},
  workforce:{label:'Workforce',landing:'admin-organizations.html?business=workforce&type=ctpa',product:'workforce',groups:[
   ['Customers & Access',[
    ['admin-workforce-ctpas.html','C/TPA Accounts'],['admin-workforce-employers.html','Non-DOT Employers'],['admin-workforce-employees.html','Employees / NON-DOT Drivers'],['admin-workforce-onboarding.html','Onboarding'],['admin-workforce-portal-access.html','NON-DOT Portal Access'],['admin-workforce-users.html','Users & Team'],['admin-customer-assignments.html?business=workforce','Staff Assignments']]],

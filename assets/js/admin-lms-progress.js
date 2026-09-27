@@ -101,10 +101,10 @@
     return {e,p,c,progress,status,lessonDone,lessonTotal,lp,quizzes,assessments,cert,last:e.last_activity_at||e.completed_at||e.started_at||e.enrolled_at||null,name:profileName(p)};
   }
   function renderStats(){
-    const views=S.enrollments.map(enrollmentView),learners=new Set(views.map(x=>x.e.user_id).filter(Boolean)).size,completed=views.filter(x=>x.status==='completed').length;
+    const views=S.enrollments.map(enrollmentView),active=views.filter(x=>x.status==='active').length,completed=views.filter(x=>x.status==='completed').length;
     const avg=views.length?Math.round(views.reduce((n,x)=>n+x.progress,0)/views.length):0;
     const lessons=new Set(S.lessonProgress.filter(isDone).map(x=>`${x.enrollment_id}:${x.lesson_id||x.id}`)).size;
-    setText('statActive',learners);setText('statAverage',avg+'%');setText('statLessons',lessons);setText('statCompleted',completed);
+    setText('statActive',active);setText('statAverage',avg+'%');setText('statLessons',lessons);setText('statCompleted',completed);
   }
   function filteredViews(){return S.enrollments.map(enrollmentView).filter(v=>{
     const hay=[v.name,v.p.email,v.p.company_name,v.c.title].filter(Boolean).join(' ').toLowerCase();

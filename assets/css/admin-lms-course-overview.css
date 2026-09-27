@@ -1134,3 +1134,88 @@
     width: 100%;
   }
 }
+
+
+/* ============================================================
+   STEP 9 — TRAINING PORTAL TYPOGRAPHY + COURSE-SCOPED OVERVIEW
+   Keep this page on the same readable scale as the Training tab.
+   ============================================================ */
+.admin-lms-course-overview-page,
+.admin-lms-course-overview-page button,
+.admin-lms-course-overview-page input,
+.admin-lms-course-overview-page select,
+.admin-lms-course-overview-page textarea {
+  font-family: Inter, Arial, sans-serif;
+  font-size: 16px;
+}
+
+.overview-workspace {
+  max-width: none;
+  padding: 20px 24px 48px;
+}
+
+.overview-breadcrumbs,
+.overview-course-tabs a,
+.overview-pill-button,
+.overview-small-button,
+.overview-action-menu button,
+.overview-loading,
+.overview-toast,
+.overview-course-meta,
+.overview-course-features,
+.overview-feature-chip,
+.overview-setup-progress strong,
+.overview-setup-copy small,
+.overview-setup-action,
+.overview-dismiss-guide,
+.overview-metric small,
+.overview-health-grid span {
+  font-size: 14px;
+}
+
+.overview-status-badge {
+  font-size: 12px;
+  min-height: 24px;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.overview-course-header h1 {
+  font-size: clamp(28px, 2.2vw, 36px);
+}
+
+.overview-course-summary-copy > strong,
+.overview-card-header h2,
+.overview-setup-copy strong {
+  font-size: 18px;
+}
+
+.overview-card-header p {
+  font-size: 14px;
+}
+
+.overview-metric strong {
+  font-size: 28px;
+}
+
+.overview-health-grid strong {
+  font-size: 18px;
+}
+
+.overview-card {
+  border-radius: 14px;
+}
+
+.overview-pill-button,
+.overview-small-button,
+.overview-circle-button {
+  min-height: 38px;
+}
+
+@media (max-width: 760px) {
+  .overview-workspace { padding: 16px 14px 36px; }
+  .overview-course-header { flex-direction: column; }
+  .overview-header-actions { flex-wrap: wrap; }
+  .overview-course-tabs { overflow-x: auto; }
+  .overview-course-tabs a { white-space: nowrap; }
+}

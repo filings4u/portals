@@ -45,14 +45,17 @@
         );
 
       state.courseId =
-        params.get("course") ||
-        params.get("course_id") ||
-        params.get("id") ||
-        "";
+        String(params.get("course") || "").trim();
 
       if (!state.courseId) {
         throw new Error(
-          "Open Course Overview from a course record so the course ID is available."
+          "Open Course Overview from the selected course so its course ID is available."
+        );
+      }
+
+      if (!isUuid(state.courseId)) {
+        throw new Error(
+          "The Course Overview URL contains an invalid course ID."
         );
       }
 
@@ -132,10 +135,31 @@
   async function loadOverviewData() {
     setLoading(true);
     const out = await trainingReport("course_overview", { course_id: state.courseId });
+    if (!out?.course || String(out.course.id || "") !== state.courseId) {
+      throw new Error("The requested course could not be loaded.");
+    }
+
+    if (out.course.admin_deleted_at) {
+      throw new Error("This course has been removed from the admin portal.");
+    }
+
     state.course = out.course;
-    state.sections = out.sections || [];
-    state.lessons = out.lessons || [];
-    state.enrollments = out.enrollments || [];
+    state.sections = (out.sections || []).filter(function (section) {
+      return String(section.course_id || "") === state.courseId;
+    });
+
+    const sectionIds = new Set(state.sections.map(function (section) {
+      return String(section.id || "");
+    }));
+
+    state.lessons = (out.lessons || []).filter(function (lesson) {
+      return sectionIds.has(String(lesson.section_id || ""));
+    });
+
+    state.enrollments = (out.enrollments || []).filter(function (enrollment) {
+      return String(enrollment.course_id || "") === state.courseId;
+    });
+
     await loadCourseThumbnail();
     setLoading(false);
   }
@@ -284,6 +308,9 @@
       "overviewCourseTitle",
       title
     );
+
+    document.title =
+      title + " | Course Overview | screenings4u Management Portal";
 
     setText(
       "overviewBreadcrumbCourse",
@@ -512,10 +539,16 @@
           const status =
             normalizeStatus(row.status);
 
+          if (status === "completed" || row.completed_at) {
+            return false;
+          }
+
           return (
             status === "active" ||
             status === "in_progress" ||
-            status === "in-progress"
+            status === "in-progress" ||
+            Boolean(row.started_at) ||
+            Number(row.progress_percent || 0) > 0
           );
         }
       ).length;
@@ -634,6 +667,21 @@
           node.href = href;
         }
       });
+
+    const tabPages = {
+      overview: "admin-lms-course-overview.html",
+      content: "admin-lms-course-builder.html",
+      participants: "admin-lms-course-participants.html",
+      settings: "admin-lms-course-settings.html",
+      engagement: "admin-lms-course-engagement.html"
+    };
+
+    document.querySelectorAll("[data-course-tab]").forEach(function (tab) {
+      const page = tabPages[tab.dataset.courseTab];
+      if (page) {
+        tab.href = page + "?course=" + encoded;
+      }
+    });
   }
 
 
@@ -1102,6 +1150,13 @@
         "false"
       );
     }
+  }
+
+
+  function isUuid(value) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      String(value || "").trim()
+    );
   }
 
 

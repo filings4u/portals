@@ -271,8 +271,12 @@
         : "admin-lms-course-preview.html";
     });
 
-    $("archiveCourseButton")?.addEventListener("click", archiveCourse);
-    $("duplicateCourseButton")?.addEventListener("click", duplicateCoursePlaceholder);
+    $("archiveCourseButton")?.addEventListener("click", function () {
+      archiveCourse(courseActionCourseId());
+    });
+    $("duplicateCourseButton")?.addEventListener("click", function () {
+      duplicateCoursePlaceholder(courseActionCourseId());
+    });
     $("publishCourseButton")?.addEventListener("click", publishEntireCourse);
 
     removeUnusedAiTools();
@@ -286,6 +290,30 @@
     const opening = menu.hidden;
     menu.hidden = !opening;
     trigger.setAttribute("aria-expanded", opening ? "true" : "false");
+
+    if (opening && menuId === "courseMoreMenu") {
+      menu.dataset.courseId = state.courseId || "";
+
+      /* Keep the three-dot menu physically anchored to its trigger even
+         when the course selector changes the width of the header actions. */
+      menu.style.left = `${trigger.offsetLeft}px`;
+      menu.style.right = "auto";
+      menu.style.top = `${trigger.offsetTop + trigger.offsetHeight + 6}px`;
+    }
+  }
+
+  function courseActionCourseId() {
+    const menu = $("courseMoreMenu");
+    const boundCourseId = String(menu?.dataset.courseId || "").trim();
+    const currentCourseId = String(state.courseId || "").trim();
+
+    if (!boundCourseId || boundCourseId !== currentCourseId) {
+      closeMenu("courseMoreMenu", "courseMoreButton");
+      showToast("The selected course changed. Open the course menu again.", "error");
+      return "";
+    }
+
+    return boundCourseId;
   }
 
   function closeMenu(menuId, triggerId) {
@@ -328,6 +356,7 @@
       ).join("");
 
     select.addEventListener("change", async function () {
+      closeMenu("courseMoreMenu", "courseMoreButton");
       state.courseId = select.value || "";
       state.course = null;
       state.sections = [];
@@ -1698,13 +1727,22 @@
   }
 
 
-  async function archiveCourse() {
-    if (!state.courseId) return;
+  async function archiveCourse(courseId) {
+    closeMenu("courseMoreMenu", "courseMoreButton");
+
+    courseId = String(courseId || "").trim();
+    if (!courseId) return;
+
+    const course = state.courses.find((item) => item.id === courseId);
+    if (!course) {
+      showToast("That course is no longer available in this builder.", "error");
+      return;
+    }
 
     const confirmed = await builderConfirm({
       eyebrow: "COURSE MANAGEMENT",
       title: "Archive course?",
-      message: "Archive this course? Learners should no longer see it as an active published course.",
+      message: `Archive "${course.title || "this course"}"? Learners should no longer see it as an active published course.`,
       confirmLabel: "Archive Course",
       danger: true
     });
@@ -1712,44 +1750,56 @@
     if (!confirmed) return;
 
     try {
-      const { error } = await db()
+      const now = new Date().toISOString();
+      const { data: archived, error } = await db()
         .from(TABLES.courses)
-        .update({ status: "archived" })
-        .eq("id", state.courseId);
+        .update({ status: "archived", updated_at: now })
+        .eq("id", courseId)
+        .select("*")
+        .single();
 
       if (error) throw error;
 
-      state.course.status = "archived";
-      renderCourseHeader();
-      closeMenu("courseMoreMenu", "courseMoreButton");
-      showToast("Course archived.", "success");
+      await loadCourseDirectory();
+
+      if (state.courseId === courseId) {
+        state.course = archived;
+        renderCourseHeader();
+      }
+
+      syncCourseSelector();
+      showToast(`"${archived.title || course.title || "Course"}" archived.`, "success");
     } catch (error) {
-      console.error(error);
+      console.error("[Archive Course]", error);
       showToast(error?.message || "Unable to archive course.", "error");
     }
   }
 
-  async function duplicateCoursePlaceholder() {
+  async function duplicateCoursePlaceholder(courseId) {
     closeMenu("courseMoreMenu", "courseMoreButton");
 
-    if (!state.courseId || !state.course) {
-      showToast("Select a course first.", "error");
+    courseId = String(courseId || "").trim();
+    if (!courseId) return;
+
+    const sourceCourse = state.courses.find((item) => item.id === courseId);
+    if (!sourceCourse) {
+      showToast("That course is no longer available in this builder.", "error");
       return;
     }
 
     const confirmed = await builderConfirm({
       eyebrow: "COURSE MANAGEMENT",
       title: "Duplicate course?",
-      message: `Duplicate "${state.course.title || "this course"}" and its curriculum? The copy will be created as a draft.`,
+      message: `Duplicate "${sourceCourse.title || "this course"}" and its curriculum? The copy will be created as a draft.`,
       confirmLabel: "Duplicate Course"
     });
 
     if (!confirmed) return;
 
     try {
-      showToast("Duplicating course...", "success");
+      showToast(`Duplicating "${sourceCourse.title || "course"}"...`, "success");
 
-      const copiedCourse = await duplicateCourseDeep(state.courseId);
+      const copiedCourse = await duplicateCourseDeep(courseId);
 
       showToast("Course duplicated. Opening the copy...", "success");
 
@@ -2623,32 +2673,13 @@
 
   async function duplicateCourseDeep(courseId) {
     /*
-     * The complete authored course is copied inside one atomic Supabase
-     * transaction. Browser navigation, refreshes, or a closed tab can no
-     * longer stop the copy halfway through and leave a partial course.
+     * The previous builder called duplicate_lms_course_deep, but that RPC is
+     * not present in this Supabase project. Use the verified deep-copy path
+     * already implemented below. It copies the selected course's sections,
+     * lessons, blocks, quizzes/questions/options, and assessments while
+     * intentionally leaving learner history on the source course.
      */
-    const { data: copiedCourseId, error } = await db()
-      .rpc("duplicate_lms_course_deep", {
-        p_course_id: courseId
-      });
-
-    if (error) throw error;
-
-    if (!copiedCourseId) {
-      throw new Error(
-        "Supabase did not return the duplicated course ID."
-      );
-    }
-
-    const { data: copiedCourse, error: copiedCourseError } = await db()
-      .from(TABLES.courses)
-      .select("*")
-      .eq("id", copiedCourseId)
-      .single();
-
-    if (copiedCourseError) throw copiedCourseError;
-
-    return copiedCourse;
+    return duplicateCourseDeepLegacy(courseId);
   }
 
 

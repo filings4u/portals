@@ -18,6 +18,10 @@ async function init() {
     cache();
     bind();
 
+    if (new URLSearchParams(window.location.search).get('engagement') === 'select-course') {
+        setTimeout(() => window.S4UUI?.modal?.({title:'Select a Course',message:'Course Engagement opens from a specific course record. Use the Engagement button for the course you want to review.',type:'info',confirmText:'Close'}), 50);
+    }
+
     try {
         client = await waitForClient();
         if (!client) throw new Error("Supabase client was not found.");
@@ -321,6 +325,8 @@ function renderPage() {
 
         const build =
             `admin-lms-course-builder.html?course=${encodeURIComponent(course.id)}`;
+        const engagement =
+            `admin-lms-course-engagement.html?course=${encodeURIComponent(course.id)}`;
 
         return `<tr>
             <td>
@@ -349,6 +355,7 @@ function renderPage() {
                         data-delete-course="${esc(course.id)}"
                     >Delete Course</button>
 
+                    <a class="course-row-btn primary" href="${engagement}">Engagement</a>
                     <a class="course-row-btn" href="${build}" data-edit-course="${esc(course.id)}">Edit Course</a>
                 </div>
             </td>

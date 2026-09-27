@@ -1,5 +1,5 @@
 /* ============================================================
-   SCREENINGS4U — ADMIN LMS COURSE SETTINGS
+   SCREENINGS4U — ADMIN LMS COURSE SETTINGS — COURSE-SCOPED
    Course image source of truth:
    lms_courses.thumbnail_media_id -> lms_media -> lms-media Storage
    ============================================================ */
@@ -9,8 +9,6 @@
   const TABLES = Object.freeze({
     courses: "lms_courses",
     media: "lms_media",
-    services: "services",
-    prices: "service_prices",
     instructors: "lms_course_instructors"
   });
 
@@ -19,14 +17,13 @@
   const state = {
     courseId: "",
     course: null,
-    service: null,
-    prices: [],
     instructors: [],
     instructorCandidates: [],
     thumbnailMedia: null,
     thumbnailUrl: "",
     client: null,
     uploadingImage: false,
+    lastModalTrigger: null,
     initialized: false,
     bound: false
   };
@@ -159,69 +156,11 @@
       courseResult.data;
 
     await Promise.all([
-      loadPricing(),
       loadThumbnail(),
       loadInstructors()
     ]);
 
     setLoading(false);
-  }
-
-  async function loadPricing() {
-    const serviceResult =
-      await db()
-        .from(TABLES.services)
-        .select("id,name,product_type,active,training_course_id")
-        .eq(
-          "training_course_id",
-          state.courseId
-        )
-        .eq("active", true)
-        .limit(1)
-        .maybeSingle();
-
-    if (serviceResult.error) {
-      console.warn(
-        "[Course Settings] Service lookup unavailable:",
-        serviceResult.error
-      );
-
-      state.service = null;
-      state.prices = [];
-      return;
-    }
-
-    state.service =
-      serviceResult.data || null;
-
-    if (!state.service?.id) {
-      state.prices = [];
-      return;
-    }
-
-    const priceResult =
-      await db()
-        .from(TABLES.prices)
-        .select("*")
-        .eq(
-          "service_id",
-          state.service.id
-        )
-        .order("active", { ascending: false })
-        .order("effective_from", { ascending: false, nullsFirst: false });
-
-    if (priceResult.error) {
-      console.warn(
-        "[Course Settings] Pricing lookup unavailable:",
-        priceResult.error
-      );
-
-      state.prices = [];
-      return;
-    }
-
-    state.prices =
-      priceResult.data || [];
   }
 
   async function loadThumbnail() {
@@ -396,9 +335,20 @@
 
     set(
       "settingVisibility",
-      status === "published"
-        ? "Published course"
-        : title(status)
+      title(status)
+    );
+
+    const creditCost = Math.max(0, Number(course.training_credit_cost ?? 1) || 0);
+    set(
+      "settingTrainingCreditCost",
+      `${creditCost} credit${creditCost === 1 ? "" : "s"}`
+    );
+
+    set(
+      "settingPublishedAt",
+      course.published_at
+        ? new Date(course.published_at).toLocaleString()
+        : "Not published"
     );
 
     set(
@@ -413,10 +363,6 @@
         "Uses course description"
     );
 
-    set(
-      "settingPricing",
-      pricingText()
-    );
 
     set(
       "settingPace",
@@ -453,50 +399,6 @@
     if ($("settingsContent")) {
       $("settingsContent").hidden = false;
     }
-  }
-
-  function pricingText() {
-    if (!state.service) {
-      return "No linked service";
-    }
-
-    if (!state.prices.length) {
-      return state.service.name ||
-        "Linked course service";
-    }
-
-    const prices =
-      state.prices.some((price) => price.active === true)
-        ? state.prices.filter((price) => price.active === true)
-        : state.prices;
-
-    return prices
-      .map((price) => {
-        const amount =
-          Number(
-            price.amount ??
-            0
-          );
-
-        const currency =
-          String(
-            price.currency || "USD"
-          ).toUpperCase();
-
-        const formatted =
-          Number.isFinite(amount)
-            ? new Intl.NumberFormat(
-                undefined,
-                {
-                  style: "currency",
-                  currency
-                }
-              ).format(amount)
-            : "Price unavailable";
-
-        return formatted;
-      })
-      .join(" / ");
   }
 
   function fillModals() {
@@ -576,23 +478,13 @@
     );
 
     setValue(
-      "paymentCourseStatus",
+      "publishingCourseStatus",
       course.status || "draft"
     );
 
     setValue(
-      "paymentProductName",
-      state.service?.name || course.title || ""
-    );
-
-    setValue(
-      "paymentPrice",
-      currentPriceAmount()
-    );
-
-    setChecked(
-      "paymentProductActive",
-      state.service?.active !== false
+      "publishingTrainingCreditCost",
+      course.training_credit_cost ?? 1
     );
 
     setValue(
@@ -636,6 +528,21 @@
     document.addEventListener(
       "click",
       async function (event) {
+        const moreMenu = $("settingsMoreMenu");
+        if (
+          moreMenu &&
+          !event.target.closest("#settingsMoreMenu") &&
+          !event.target.closest("#settingsMoreButton")
+        ) {
+          moreMenu.hidden = true;
+        }
+
+        if (event.target.classList?.contains("settings-modal-backdrop")) {
+          event.preventDefault();
+          closeModals();
+          return;
+        }
+
         const richButton = event.target.closest("[data-rich-command]");
         if (richButton) {
           event.preventDefault();
@@ -664,7 +571,7 @@
         }
 
         const saveButton = event.target.closest(
-          "#saveBasicSettings, #saveContentSettings, #saveCompletionSettings, #saveInstructorSettings, #saveScheduleSettings, #savePaymentSettings, #saveSeoSettings"
+          "#saveBasicSettings, #saveContentSettings, #saveCompletionSettings, #saveInstructorSettings, #saveScheduleSettings, #savePublishingSettings, #saveSeoSettings"
         );
         if (saveButton) {
           event.preventDefault();
@@ -673,7 +580,7 @@
           if (saveButton.id === "saveCompletionSettings") await saveCompletion();
           if (saveButton.id === "saveInstructorSettings") await saveInstructors();
           if (saveButton.id === "saveScheduleSettings") await saveSchedule();
-          if (saveButton.id === "savePaymentSettings") await savePayment();
+          if (saveButton.id === "savePublishingSettings") await savePublishing();
           if (saveButton.id === "saveSeoSettings") await saveSeo();
           return;
         }
@@ -706,6 +613,13 @@
         }
       }
     );
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") return;
+      const moreMenu = $("settingsMoreMenu");
+      if (moreMenu) moreMenu.hidden = true;
+      closeModals();
+    });
   }
 
   function editCard(kind) {
@@ -729,9 +643,9 @@
       );
     }
 
-    if (kind === "payment") {
+    if (kind === "publishing") {
       fillModals();
-      return open("paymentSettingsModal");
+      return open("publishingSettingsModal");
     }
 
     if (kind === "schedule") {
@@ -846,141 +760,41 @@
     );
   }
 
-  async function savePayment() {
-    const button = $("savePaymentSettings");
-    if (button) button.disabled = true;
+  async function savePublishing() {
+    const statusValue = $("publishingCourseStatus")?.value || "draft";
+    const creditsRaw = $("publishingTrainingCreditCost")?.value ?? "1";
+    const credits = Math.max(0, Math.round(Number(creditsRaw)));
 
-    try {
-      const statusValue = $("paymentCourseStatus")?.value || "draft";
-      const productName =
-        $("paymentProductName")?.value.trim() ||
-        state.course?.title ||
-        "Course";
-
-      const rawPrice = $("paymentPrice")?.value;
-      const amount = Number(rawPrice);
-
-      if (!Number.isFinite(amount) || amount < 0) {
-        throw new Error("Enter a valid price of 0 or greater.");
-      }
-
-      const courseResult = await db()
-        .from(TABLES.courses)
-        .update({
-          status: statusValue,
-          published_at:
-            statusValue === "published"
-              ? (state.course?.published_at || new Date().toISOString())
-              : state.course?.published_at || null,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", state.courseId)
-        .select("*")
-        .single();
-
-      if (courseResult.error) throw courseResult.error;
-      state.course = courseResult.data;
-
-      let service = state.service;
-
-      if (!service?.id) {
-        const serviceResult = await db()
-          .from(TABLES.services)
-          .insert({
-            name: productName,
-            slug: `${slugify(state.course.slug || state.course.title)}-course`,
-            description: stripRichText(state.course.description || state.course.short_description || ""),
-            product_type: "course",
-            active: $("paymentProductActive")?.checked !== false,
-            taxable: false,
-            training_course_id: state.courseId,
-            metadata: {
-              lms: {
-                created_from: "course_settings",
-                pricing_mode: amount > 0 ? "paid" : "free"
-              }
-            }
-          })
-          .select("*")
-          .single();
-
-        if (serviceResult.error) throw serviceResult.error;
-        service = serviceResult.data;
-        state.service = service;
-      } else {
-        const serviceResult = await db()
-          .from(TABLES.services)
-          .update({
-            name: productName,
-            active: $("paymentProductActive")?.checked !== false,
-            training_course_id: state.courseId,
-            updated_at: new Date().toISOString()
-          })
-          .eq("id", service.id)
-          .select("*")
-          .single();
-
-        if (serviceResult.error) throw serviceResult.error;
-        service = serviceResult.data;
-        state.service = service;
-      }
-
-      const activePrices = (state.prices || []).filter((price) => price.active === true);
-      if (activePrices.length) {
-        const deactivateResult = await db()
-          .from(TABLES.prices)
-          .update({
-            active: false,
-            effective_to: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-          .in("id", activePrices.map((price) => price.id));
-
-        if (deactivateResult.error) throw deactivateResult.error;
-      }
-
-      const priceResult = await db()
-        .from(TABLES.prices)
-        .insert({
-          service_id: service.id,
-          price_key: `course-${state.courseId}-${Date.now()}`,
-          amount,
-          currency: "USD",
-          billing_interval: "one_time",
-          active: true,
-          effective_from: new Date().toISOString(),
-          metadata: {
-            source: "admin_lms_course_settings"
-          }
-        })
-        .select("*")
-        .single();
-
-      if (priceResult.error) throw priceResult.error;
-
-      state.prices = [priceResult.data];
-      closeModals();
-      render();
-      toast("Course product and pricing saved.", "success");
-    } catch (error) {
-      console.error("[Course Product Save]", error);
-      toast(error?.message || "Unable to save course product.", "error");
-    } finally {
-      if (button) button.disabled = false;
+    if (!Number.isFinite(Number(creditsRaw)) || Number(creditsRaw) < 0) {
+      toast("Training credit cost must be 0 or greater.", "error");
+      return;
     }
+
+    const payload = {
+      status: statusValue,
+      training_credit_cost: credits,
+      published_at:
+        statusValue === "published"
+          ? (state.course?.published_at || new Date().toISOString())
+          : (state.course?.published_at || null),
+      updated_at: new Date().toISOString()
+    };
+
+    await update(payload, "Publishing and access settings saved.");
   }
 
   async function saveContent() {
+    const videoPercent = Number($("contentVideoPercent")?.value ?? 90);
+    if (!Number.isFinite(videoPercent) || videoPercent < 0 || videoPercent > 100) {
+      toast("Video completion percentage must be between 0 and 100.", "error");
+      return;
+    }
+
     const payload = {
       navigation_mode:
         $("contentNavigationMode")
           ?.value || "free",
-      video_completion_percent:
-        num(
-          $("contentVideoPercent")
-            ?.value,
-          90
-        ),
+      video_completion_percent: videoPercent,
       require_all_required_lessons:
         $("contentRequireLessons")
           ?.checked !== false,
@@ -1004,13 +818,14 @@
   }
 
   async function saveCompletion() {
+    const passingScore = Number($("completionPassingScore")?.value ?? 80);
+    if (!Number.isFinite(passingScore) || passingScore < 0 || passingScore > 100) {
+      toast("Passing score must be between 0 and 100.", "error");
+      return;
+    }
+
     const payload = {
-      passing_score:
-        num(
-          $("completionPassingScore")
-            ?.value,
-          80
-        ),
+      passing_score: passingScore,
       certificate_enabled:
         Boolean(
           $("completionCertificate")
@@ -1125,10 +940,21 @@
 
   async function update(payload, message) {
     try {
+      if (!isUuid(state.courseId)) {
+        throw new Error("A valid course ID is required before settings can be saved.");
+      }
+
+      const sessionResult = await db().auth.getSession();
+      const userId = sessionResult?.data?.session?.user?.id || null;
+      const exactPayload = {
+        ...payload,
+        ...(userId ? { updated_by: userId } : {})
+      };
+
       const result =
         await db()
           .from(TABLES.courses)
-          .update(payload)
+          .update(exactPayload)
           .eq("id", state.courseId)
           .select("*")
           .single();
@@ -1931,24 +1757,41 @@
 
   function open(id) {
     const node = $(id);
+    if (!node) return;
 
-    if (node) {
-      node.hidden = false;
-      node.removeAttribute("hidden");
-      node.setAttribute("aria-hidden", "false");
-      node.querySelector("input, select, textarea, button")?.focus();
-    }
+    state.lastModalTrigger =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    node.hidden = false;
+    node.removeAttribute("hidden");
+    node.removeAttribute("inert");
+    node.inert = false;
+    node.setAttribute("aria-hidden", "false");
+    node.querySelector("input, select, textarea, button")?.focus();
   }
 
   function closeModals() {
+    const active = document.activeElement;
+    const openModal = active?.closest?.(".settings-modal-backdrop");
+
+    if (openModal && state.lastModalTrigger?.isConnected) {
+      state.lastModalTrigger.focus({ preventScroll: true });
+    } else if (openModal && active instanceof HTMLElement) {
+      active.blur();
+    }
+
     document
-      .querySelectorAll(
-        ".settings-modal-backdrop"
-      )
+      .querySelectorAll(".settings-modal-backdrop")
       .forEach((modal) => {
-        modal.hidden = true;
+        modal.setAttribute("inert", "");
+        modal.inert = true;
         modal.setAttribute("aria-hidden", "true");
+        modal.hidden = true;
       });
+
+    state.lastModalTrigger = null;
   }
 
   function links() {
@@ -2077,11 +1920,6 @@
   }
 
 
-  function currentPriceAmount() {
-    const active = (state.prices || []).find((price) => price.active === true);
-    const price = active || state.prices?.[0];
-    return price ? Number(price.amount || 0).toFixed(2) : "0.00";
-  }
 
   async function richCommand(button) {
     const editor = $("basicDescriptionEditor");

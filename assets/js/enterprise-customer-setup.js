@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id), $$=s=>[...document.querySelectorAll(s)];
-const qs=new URLSearchParams(location.search);const rawBusiness=String(qs.get('business')||'').toLowerCase();const FIXED_BUSINESS=['testing','training','workforce','dot'].includes(rawBusiness)?rawBusiness:'';
+const qs=new URLSearchParams(location.search);const bodyBusiness=String(document.body?.dataset?.businessCode||document.body?.dataset?.s4uBusiness||'').toLowerCase();const rawBusiness=String(qs.get('business')||bodyBusiness||'').toLowerCase();const FIXED_BUSINESS=['testing','training','workforce','dot'].includes(rawBusiness)?rawBusiness:'';
 let provisioningOptions={},catalog={},accounts=[],cart=[],orderSettings={},activeCatalog='testing',customerType='business',busy=false;
 const BUSINESS_LABEL={testing:'Testing',training:'Training',workforce:'NON-DOT Workforce',dot:'DOT'};
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

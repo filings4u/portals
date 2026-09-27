@@ -192,7 +192,8 @@
 
 .course-action-menu {
   top: 44px;
-  right: 185px;
+  left: 0;
+  right: auto;
 }
 
 .course-action-menu button,

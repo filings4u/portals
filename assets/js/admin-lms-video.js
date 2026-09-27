@@ -1912,6 +1912,23 @@
       `;
     }
 
+    if (video.provider === "cloudflare_stream") {
+      const uid = String(video.provider_video_id || "").trim();
+      if (!uid) {
+        return previewFallback("Cloudflare Stream video ID is unavailable.");
+      }
+      return `
+        <div class="video-preview-frame">
+          <iframe
+            src="https://customer-dakmi8r1pa369sua.cloudflarestream.com/${esc(uid)}/iframe"
+            title="${esc(video.title || "Cloudflare Stream video")}"
+            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+            allowfullscreen
+          ></iframe>
+        </div>
+      `;
+    }
+
     if (
       video.provider ===
       "external"
