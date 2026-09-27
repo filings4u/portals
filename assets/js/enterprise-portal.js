@@ -38,13 +38,9 @@ const ICONS={
 };
 const modules={
  enterprise:{label:'Enterprise',landing:'admin-dashboard.html',product:null,groups:[
-  ['Customers & Identity',[
-   ['admin-organizations.html','Organizations & Accounts','crm'],['admin-people.html','People & Identity','staff'],['admin-access.html','Portal Users & Access','user'],['admin-customer-setup.html','Customer Setup & Configuration','settings']]],
-  ['Work Management',[
-   ['admin-work-management.html','Task Manager','schedule']]],
-  ['Commerce & Service',[
-   ['admin-catalog-management.html','Global Catalog Governance','services'],['admin-intake-documents.html','Intake Documents','docs']]],
-  ['Governance',[
+  ['Global Ecosystem',[
+   ['admin-catalog-management.html','Global Catalog Governance','services'],['admin-intake-documents.html','Global Intake Documents','docs']]],
+  ['Global Governance',[
    ['admin-legacy-routes.html','Portal Routes','tech']]]]},
  testing:{label:'Testing',landing:'admin-testing.html',product:'screenings4u',groups:[
   ['Operations',[
@@ -55,6 +51,8 @@ const modules={
    ['admin-testing-customers.html','Customers & Employers','user'],['admin-testing-portal-access.html','Portal Access','settings'],['admin-testing-proposals.html','Proposals','crm'],['admin-testing-background-checks.html','Background Checks','services']]],
   ['Resources & Content',[
    ['admin-testing-documents.html','Private Documents','docs'],['admin-testing-collectors.html','Collector Network','workforce'],['admin-testing-services.html','Services & Pricing','services'],['admin-testing-blog.html','Blog Editor','docs'],['admin-testing-reports.html','Reports','audit']]],
+  ['Company Administration',[
+   ['admin-organizations.html?business=testing','Organizations & Accounts','crm'],['admin-people.html?business=testing','People & Identity','staff'],['admin-access.html?business=testing','Portal Users & Access','user'],['admin-customer-setup.html?business=testing','Customer Setup & Configuration','settings'],['admin-testing-tasks.html','Task Manager','schedule']]],
   ['Business Administration',[
    ['admin-testing-settings.html','Settings','settings'],['admin-testing-support.html','Support','help'],['admin-testing-billing.html','Billing & Receivables','finance'],['admin-testing-invoices.html','Invoicing','finance'],['admin-notifications.html?business=testing','Notifications','bell']]]]},
  training:{label:'Training',landing:'admin-lms-courses.html',product:'training',groups:[
@@ -66,6 +64,8 @@ const modules={
    ['admin-training-catalog.html','Storefront & Pricing','services'],['admin-lms-orders.html','Training Orders','orders'],['admin-lms-group-seats.html','Group Training Seats','training']]],
   ['Operations & Reporting',[
    ['admin-lms-reports.html','Reports','audit']]],
+  ['Company Administration',[
+   ['admin-organizations.html?business=training','Organizations & Accounts','crm'],['admin-people.html?business=training','People & Identity','staff'],['admin-access.html?business=training','Portal Users & Access','user'],['admin-customer-setup.html?business=training','Customer Setup & Configuration','settings'],['admin-training-tasks.html','Task Manager','schedule']]],
   ['Business Administration',[
    ['admin-training-settings.html','Settings','settings'],['admin-training-support.html','Support','help'],['admin-training-billing.html','Billing & Receivables','finance'],['admin-training-invoices.html','Invoicing','finance'],['admin-notifications.html?business=training','Notifications','bell']]]]},
  workforce:{label:'Workforce',landing:'admin-organizations.html?business=workforce&type=ctpa',product:'workforce',groups:[
@@ -77,6 +77,8 @@ const modules={
    ['admin-workforce-catalog.html','Storefront, Plans & Pricing','services'],['admin-customer-setup.html?business=workforce&tab=manage','Locations'],['admin-customer-setup.html?business=workforce&tab=manage','Branding'],['admin-customer-setup.html?business=workforce&tab=manage','Consents & Acknowledgments'],['admin-customer-setup.html?business=workforce&tab=manage','Credentials']]],
   ['Operations & Compliance',[
    ['admin-workforce-catalog.html?view=services','Service Configuration'],['admin-workforce-compliance.html','Compliance Cases'],['admin-customer-setup.html?business=workforce&tab=manage','Policies'],['admin-workforce-training.html','Training Records'],['admin-workforce-reports.html','Reports']]],
+  ['Company Administration',[
+   ['admin-organizations.html?business=workforce','Organizations & Accounts','crm'],['admin-people.html?business=workforce','People & Identity','staff'],['admin-access.html?business=workforce','Portal Users & Access','user'],['admin-customer-setup.html?business=workforce','Customer Setup & Configuration','settings'],['admin-workforce-tasks.html','Task Manager','schedule']]],
   ['Business Administration',[
    ['admin-workforce-settings.html','Settings','settings'],['admin-workforce-support.html','Support','help'],['admin-workforce-billing.html','Billing & Receivables','finance'],['admin-workforce-invoices.html','Invoicing','finance'],['admin-notifications.html?business=workforce','Notifications','bell']]]]},
  dot:{label:'DOT',landing:'admin-organizations.html?business=dot&type=ctpa',product:'dot',groups:[
@@ -90,6 +92,8 @@ const modules={
    ['admin-dot-fmcsa.html','FMCSA'],['admin-dot-faa.html','FAA'],['admin-dot-fra.html','FRA'],['admin-dot-fta.html','FTA'],['admin-dot-phmsa.html','PHMSA'],['admin-dot-uscg.html','USCG']]],
   ['Regulatory Operations',[
    ['admin-dot-clearinghouse.html','Clearinghouse'],['admin-dot-new-entrant.html','New Entrant Audits'],['admin-dot-rtd.html','Return-to-Duty / SAP'],['admin-dot-compliance.html','Compliance Cases'],['admin-dot-catalog.html','DOT Service Catalog'],['admin-dot-orders.html','Service Orders'],['admin-dot-reports.html','Reports']]],
+  ['Company Administration',[
+   ['admin-organizations.html?business=dot','Organizations & Accounts','crm'],['admin-people.html?business=dot','People & Identity','staff'],['admin-access.html?business=dot','Portal Users & Access','user'],['admin-customer-setup.html?business=dot','Customer Setup & Configuration','settings'],['admin-dot-tasks.html','Task Manager','schedule']]],
   ['Business Administration',[
    ['admin-dot-settings.html','Settings','settings'],['admin-dot-support.html','Support','help'],['admin-dot-billing.html','Billing & Receivables','finance'],['admin-dot-invoices.html','Invoicing','finance'],['admin-notifications.html?business=dot','Notifications','bell']]]]},
  finance:{label:'Finance',landing:'admin-finance-ar.html',product:'finance',permission:c=>!c||c.super_admin||(c.permissions||[]).some(x=>String(x).startsWith('finance.')),groups:[
@@ -168,6 +172,10 @@ function moduleForPage(){
  const shared=new Set(['admin-organizations.html','admin-organization.html','admin-customer-operations.html','admin-organization-operations.html','admin-customer-setup.html','admin-compliance-command-center.html','admin-agency-workforce-management.html','admin-work-management.html','admin-people.html','admin-person.html','admin-access.html']);
  if(shared.has(page)&&['testing','training','workforce','dot'].includes(queryBusiness))return queryBusiness;
  if(page==='admin-dashboard.html'||['admin-security-access.html','admin-legacy-routes.html','admin-staff.html','admin-customer-assignments.html','admin-audit.html','admin-audit-event.html','admin-global-settings.html','admin-technology.html','admin-integration.html','admin-enterprise-search.html','admin-intake-documents.html'].includes(page))return 'enterprise';
+ if(page==='admin-testing-tasks.html')return 'testing';
+ if(page==='admin-training-tasks.html')return 'training';
+ if(page==='admin-workforce-tasks.html')return 'workforce';
+ if(page==='admin-dot-tasks.html')return 'dot';
  if(page==='admin-testing-command-center.html'||page==='admin-testing.html')return 'testing';
  if(explicit[page])return explicit[page];
  if(page.startsWith('admin-lms-'))return 'training';
