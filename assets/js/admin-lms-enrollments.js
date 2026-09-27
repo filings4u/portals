@@ -23,7 +23,7 @@
   function draw(){
     const q=$('enrollmentSearch').value.toLowerCase(),cf=$('courseFilter').value,sf=$('statusFilter').value;
     const rows=R.filter(x=>(!q||[x.name,x.email,x.courseTitle].join(' ').toLowerCase().includes(q))&&(cf==='all'||x.course_id===cf)&&(sf==='all'||x.viewStatus===sf));
-    $('enrollmentList').innerHTML=rows.map(x=>`<tr><td><b>${esc(x.name)}</b><br><small>${esc(x.email)}</small></td><td>${esc(x.courseTitle)}<br><small>${esc(x.assignment_source||'training')}</small></td><td>${Math.round(x.progress)}%</td><td><span class="badge ${esc(x.viewStatus)}">${esc(x.viewStatus.replaceAll('-',' '))}</span></td><td>${esc(fmt(x.expires_at))}</td><td><a class="mg-btn" href="admin-lms-enrollment.html?id=${encodeURIComponent(x.id)}">Manage</a></td></tr>`).join('')||'<tr><td colspan="6" class="mg-empty">No enrollments match the current filters.</td></tr>';
+    $('enrollmentList').innerHTML=rows.map(x=>`<tr><td><b>${esc(x.name)}</b><br><small>${esc(x.email)}</small></td><td>${esc(x.courseTitle)}<br><small>${esc(x.assignment_source||'training')}</small></td><td>${Math.round(x.progress)}%</td><td><span class="badge ${esc(x.viewStatus)}">${esc(x.viewStatus.replaceAll('-',' '))}</span></td><td>${esc(fmt(x.expires_at))}</td><td><a class="mg-btn" href="admin-lms-learner.html?user=${encodeURIComponent(x.user_id)}&enrollment=${encodeURIComponent(x.id)}">Manage</a></td></tr>`).join('')||'<tr><td colspan="6" class="mg-empty">No enrollments match the current filters.</td></tr>';
   }
   function renderStats(){
     $('statTotal').textContent=R.length;

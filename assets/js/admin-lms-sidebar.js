@@ -210,7 +210,9 @@ bindUserDropdown();
         { label: "Video Library", href: "admin-lms-video.html", icon: "video" },
         { label: "Learner Progress", href: "admin-lms-progress.html", icon: "results" },
         { label: "Certificates", href: "admin-lms-certificates.html", icon: "document" },
-        { label: "Documents", href: "admin-lms-documents.html", icon: "document" }
+        { label: "Documents", href: "admin-lms-documents.html", icon: "document" },
+        { label: "Support", href: "admin-service-desk.html?business=training", icon: "support" },
+        { label: "Notifications", href: "admin-notifications.html?business=training", icon: "bell" }
       ]
     },
 
