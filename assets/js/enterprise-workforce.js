@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const $=(s,r=document)=>r.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const BASE='https://wyezpseboxbmkedvbmyx.supabase.co/functions/v1/',READ=BASE+'workforce-enterprise-management',WRITE=BASE+'workforce-enterprise-actions',WFK='sb_publishable__BLewZS6h2V4yUczky-BTQ_EemiOdDL';
+const BASE='https://elpbnytpciqnbexiaebp.supabase.co/functions/v1/',READ=BASE+'workforce-enterprise-management',WRITE=BASE+'workforce-enterprise-actions',WFK='sb_publishable_xVI6Mjkk1bNVMGHZCPuK6w_8FSHKdkC';
 const page=(location.pathname.split('/').pop()||'admin-workforce.html').toLowerCase(), qs=new URLSearchParams(location.search);
 const state={data:null,query:''};
 const statusClass=s=>['active','available','completed','published'].includes(String(s||'').toLowerCase())?'good':['inactive','archived','cancelled','failed','terminated','closed'].includes(String(s||'').toLowerCase())?'bad':'warn';

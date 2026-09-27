@@ -1,7 +1,7 @@
 
 (()=>{'use strict';
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-const END='https://elpbnytpciqnbexiaebp.supabase.co/functions/v1/dot-enterprise-management';
+const END='https://elpbnytpciqnbexiaebp.supabase.co/functions/v1/enterprise-agency-workforce';
 const KEY='sb_publishable_xVI6Mjkk1bNVMGHZCPuK6w_8FSHKdkC';
 const agency=String(document.body.dataset.dotAgency||'').toUpperCase();
 const state={data:null};
@@ -58,7 +58,7 @@ const META={
 const M=META[agency]||META.FMCSA;
 
 async function client(){for(let i=0;i<40;i++){const c=window.screenings4uSupabase||window.supabaseClient;if(c?.auth?.getSession)return c;await new Promise(r=>setTimeout(r,50))}throw new Error('Supabase client unavailable.')}
-async function call(action,extra={}){const c=await client(),{data:{session}}=await c.auth.getSession();if(!session)throw new Error('Your staff session has expired.');const r=await fetch(END,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`,'apikey':KEY},body:JSON.stringify({action,agency_code:agency,...extra})});const d=await r.json().catch(()=>({}));if(!r.ok||d.error)throw new Error(d.error||`Request failed (${r.status}).`);return d}
+async function call(action,extra={}){if(action!=='agency_workspace')throw new Error('Agency edits are temporarily disabled until the legacy agency backend is upgraded to dot.manage authorization.');const c=await client(),{data:{session}}=await c.auth.getSession();if(!session)throw new Error('Your staff session has expired.');const payload=action==='agency_workspace'?{action:'module',business:'dot',agency}:{action:'action',business:'dot',agency,operation:action,payload:extra};const r=await fetch(END,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`,'apikey':KEY},body:JSON.stringify(payload)});const d=await r.json().catch(()=>({}));if(!r.ok||d.error)throw new Error(d.error||`Request failed (${r.status}).`);return action==='agency_workspace'?(d.data||d):(d.result?{[action.replace(/^save_agency_/,'')]:d.result,...d}:d)}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=v=>{if(!v)return'—';const d=new Date(v);return Number.isNaN(d.getTime())?esc(v):new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric'}).format(d)};
 const badge=v=>`<span class="ep-business-pill">${esc(String(v||'—').replaceAll('_',' '))}</span>`;

@@ -1,7 +1,7 @@
 (()=>{'use strict';
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const BASE='https://wyezpseboxbmkedvbmyx.supabase.co/functions/v1/',KEY='sb_publishable__BLewZS6h2V4yUczky-BTQ_EemiOdDL';
+const BASE='https://elpbnytpciqnbexiaebp.supabase.co/functions/v1/',KEY='sb_publishable_xVI6Mjkk1bNVMGHZCPuK6w_8FSHKdkC';
 const READ=BASE+'workforce-enterprise-management',WRITE=BASE+'workforce-enterprise-actions';
 const page=(location.pathname.split('/').pop()||'').toLowerCase();let state={data:null};
 const cfg={
