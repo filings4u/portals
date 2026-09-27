@@ -92,6 +92,23 @@ function bind() {
     });
 
     el.courseTableBody?.addEventListener("click", event => {
+        const editButton = event.target.closest("[data-edit-course]");
+        if (editButton) {
+            event.preventDefault();
+            const courseId = String(editButton.dataset.editCourse || "").trim();
+            if (!courseId || !courses.some(item => item.id === courseId)) {
+                window.S4UUI?.modal?.({
+                    title: "Course Not Available",
+                    message: "The selected course record could not be found. Refresh the course list and try again.",
+                    type: "error",
+                    confirmText: "Close"
+                });
+                return;
+            }
+            window.location.assign(`admin-lms-course-builder.html?course=${encodeURIComponent(courseId)}`);
+            return;
+        }
+
         const button = event.target.closest("[data-delete-course]");
         if (!button) return;
 
@@ -332,7 +349,7 @@ function renderPage() {
                         data-delete-course="${esc(course.id)}"
                     >Delete Course</button>
 
-                    <a class="course-row-btn" href="${build}">Edit</a>
+                    <a class="course-row-btn" href="${build}" data-edit-course="${esc(course.id)}">Edit Course</a>
                 </div>
             </td>
         </tr>`;
@@ -376,7 +393,7 @@ function closeDeleteModal() {
 
     if (el.courseDeleteConfirm) {
         el.courseDeleteConfirm.disabled = false;
-        el.courseDeleteConfirm.textContent = "Archive Course";
+        el.courseDeleteConfirm.textContent = "Delete Course";
     }
 }
 
@@ -386,34 +403,31 @@ async function deleteCourse() {
 
     try {
         el.courseDeleteConfirm.disabled = true;
-        el.courseDeleteConfirm.textContent = "Archiving...";
+        el.courseDeleteConfirm.textContent = "Deleting...";
 
         /*
-         * Courses with enrollment or progress records are archived instead of hard-deleted so related records remain intact.
+         * Admin Delete is a soft delete. The course and all historical LMS records
+         * remain in Supabase, while course_directory stops returning it to the admin portal.
          */
-        const { error } = await client
-            .from("lms_courses")
-            .update({ status: "archived", updated_at: new Date().toISOString() })
-            .eq("id", course.id);
-
-        if (error) throw error;
+        await trainingReport("soft_delete_course", { course_id: course.id });
 
         closeDeleteModal();
 
-        const localCourse = courses.find(item => item.id === course.id);
-        if (localCourse) localCourse.status = "archived";
+        courses = courses.filter(item => item.id !== course.id);
+        filtered = filtered.filter(item => item.id !== course.id);
 
         fillStatusFilter();
         updateMetrics();
+        page = 1;
         render();
 
     } catch (error) {
-        console.error("[Archive Course]", error);
+        console.error("[Delete Course]", error);
 
         el.courseDeleteConfirm.disabled = false;
-        el.courseDeleteConfirm.textContent = "Archive Course";
+        el.courseDeleteConfirm.textContent = "Delete Course";
 
-        window.S4UUI.modal({title:"Unable to Archive Course",message:error.message || "Unable to archive this course.",type:"error",confirmText:"Close"});
+        window.S4UUI.modal({title:"Unable to Delete Course",message:error.message || "Unable to remove this course from the admin portal.",type:"error",confirmText:"Close"});
     }
 }
 

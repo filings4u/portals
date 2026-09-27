@@ -42,6 +42,7 @@
   }
 
   function bind() {
+    $("creationForm")?.addEventListener("submit", (event) => event.preventDefault());
     $("courseName").addEventListener("input", () => {
       updateNameCount();
       updateReview();
@@ -145,7 +146,7 @@
 
   function goBack() {
     if (state.step <= 1) {
-      window.location.href = "admin-lms-courses.html";
+      window.location.href = "admin-lms-dashboard.html";
       return;
     }
 
@@ -166,7 +167,7 @@
     $("creationProgressFill").style.width = `${state.step * 25}%`;
 
     $("creationBack").textContent =
-      state.step === 1 ? "‹ Back to courses" : "‹ Back";
+      state.step === 1 ? "‹ Back to Training" : "‹ Back";
 
     const last = state.step === 4;
     $("creationNext").hidden = last;
@@ -268,200 +269,55 @@
     state.creating = true;
     updateActions();
 
-    const client = await getClient();
-
-    let createdCourseId = "";
-    let createdServiceId = "";
-    let createdPriceId = "";
-
     try {
       show("Creating course...", "success");
 
-      const { data: sessionData, error: sessionError } =
-        await client.auth.getSession();
-
-      if (sessionError) throw sessionError;
-
-      const userId = sessionData?.session?.user?.id || null;
+      const client = await getClient();
       const title = $("courseName").value.trim();
-      const baseSlug = slugify(title) || `course-${Date.now()}`;
-      const courseSlug = await uniqueSlug(
-        client,
-        "lms_courses",
-        baseSlug
-      );
-
-      const now = new Date().toISOString();
-
-      const { data: course, error: courseError } = await client
-        .from("lms_courses")
-        .insert({
-          title,
-          slug: courseSlug,
-          status: "draft",
-          created_by: userId,
-          updated_by: userId,
-          updated_at: now
-        })
-        .select("id,title,slug,status")
-        .single();
-
-      if (courseError) throw courseError;
-
-      createdCourseId = course.id;
-
-      const serviceSlug = await uniqueSlug(
-        client,
-        "services",
-        courseSlug
-      );
-
-      const serviceMetadata = {
-        lms: {
-          delivery_mode: state.delivery,
-          completion_window:
-            state.duration === "time_limit"
-              ? {
-                  type: "time_limit",
-                  days: Number($("completionDays").value)
-                }
-              : {
-                  type: "unlimited"
-                },
-          pricing_mode: state.pricing,
-          created_from: "admin-lms-creation"
-        }
-      };
-
-      const { data: service, error: serviceError } = await client
-        .from("services")
-        .insert({
-          name: title,
-          slug: serviceSlug,
-          product_type: "course",
-          active: true,
-          taxable: state.pricing === "paid",
-          training_course_id: createdCourseId,
-          metadata: serviceMetadata,
-          updated_at: now
-        })
-        .select("id")
-        .single();
-
-      if (serviceError) throw serviceError;
-
-      createdServiceId = service.id;
-
-      const amount =
+      const completionDays =
+        state.duration === "time_limit"
+          ? Number($("completionDays").value || 0)
+          : null;
+      const price =
         state.pricing === "paid"
-          ? Number($("coursePrice").value)
+          ? Number($("coursePrice").value || 0)
           : 0;
 
-      const { data: price, error: priceError } = await client
-        .from("service_prices")
-        .insert({
-          service_id: createdServiceId,
-          amount,
-          currency: "USD",
-          billing_interval: "one_time",
-          active: true,
-          metadata: {
-            lms_course_id: createdCourseId,
-            pricing_mode: state.pricing
-          },
-          updated_at: now
-        })
-        .select("id")
-        .single();
+      const { data, error } = await client.rpc(
+        "enterprise_training_create_course",
+        {
+          p_title: title,
+          p_delivery_mode: state.delivery,
+          p_duration_mode: state.duration,
+          p_completion_days: completionDays,
+          p_pricing_mode: state.pricing,
+          p_price: price
+        }
+      );
 
-      if (priceError) throw priceError;
+      if (error) throw error;
 
-      createdPriceId = price.id;
+      const createdCourseId = data?.course_id;
+      if (!createdCourseId) {
+        throw new Error("The course was created without a course ID.");
+      }
 
       show("Course created. Opening the Course Builder...", "success");
 
       window.setTimeout(() => {
-        window.location.href =
-          `admin-lms-course-builder.html?course=${encodeURIComponent(createdCourseId)}`;
-      }, 350);
-
+        window.location.assign(
+          `admin-lms-course-builder.html?course=${encodeURIComponent(createdCourseId)}`
+        );
+      }, 250);
     } catch (error) {
       console.error("[Course Creation]", error);
-
-      await rollbackCreation(
-        client,
-        createdPriceId,
-        createdServiceId,
-        createdCourseId
-      );
-
-      show(
-        error?.message || "Unable to create the course.",
-        "error"
-      );
-
+      show(error?.message || "Unable to create the course.", "error");
       state.creating = false;
       updateActions();
     }
   }
 
-  async function rollbackCreation(client, priceId, serviceId, courseId) {
-    try {
-      if (priceId) {
-        await client
-          .from("service_prices")
-          .delete()
-          .eq("id", priceId);
-      }
 
-      if (serviceId) {
-        await client
-          .from("services")
-          .delete()
-          .eq("id", serviceId);
-      }
-
-      if (courseId) {
-        await client
-          .from("lms_courses")
-          .update({ status: "archived", updated_at: new Date().toISOString() })
-          .eq("id", courseId);
-      }
-    } catch (rollbackError) {
-      console.error("[Course Creation Rollback]", rollbackError);
-    }
-  }
-
-  async function uniqueSlug(client, table, base) {
-    let candidate = base;
-    let attempt = 0;
-
-    while (attempt < 20) {
-      const { data, error } = await client
-        .from(table)
-        .select("id")
-        .eq("slug", candidate)
-        .limit(1);
-
-      if (error) throw error;
-
-      if (!data?.length) return candidate;
-
-      attempt += 1;
-      candidate = `${base}-${attempt + 1}`;
-    }
-
-    return `${base}-${Date.now().toString(36)}`;
-  }
-
-  function slugify(value) {
-    return String(value || "")
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 170);
-  }
 
   function money(value) {
     return Number(value || 0).toLocaleString("en-US", {

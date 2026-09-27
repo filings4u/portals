@@ -60,6 +60,19 @@
         return;
       }
 
+      if (state.courseId) {
+        const requestedCourseId = state.courseId;
+        state.courseId = "";
+        state.course = null;
+        state.sections = [];
+        state.activeSectionId = "";
+        renderNoCourseSelected();
+        syncCourseSelector();
+        setLoading(false);
+        showToast(`Course ${requestedCourseId} was not found. Return to Courses and select Edit Course again.`, "error");
+        return;
+      }
+
       if (state.courses.length === 1) {
         state.courseId = state.courses[0].id;
         const url = new URL(window.location.href);
@@ -1407,7 +1420,7 @@
 
       window.setTimeout(function () {
         window.location.href =
-          `admin-lms-lesson-editor.html?course=${encodeURIComponent(state.courseId)}&lesson=${encodeURIComponent(data.id)}`;
+          `admin-lms-lesson-builder.html?course=${encodeURIComponent(state.courseId)}&lesson=${encodeURIComponent(data.id)}`;
       }, 250);
     } catch (error) {
       console.error(error);
@@ -2005,7 +2018,7 @@
         label: "Edit Lesson",
         action: async () => {
           window.location.href =
-            `admin-lms-lesson-editor.html?course=${encodeURIComponent(state.courseId)}&lesson=${encodeURIComponent(lessonId)}`;
+            `admin-lms-lesson-builder.html?course=${encodeURIComponent(state.courseId)}&lesson=${encodeURIComponent(lessonId)}`;
         }
       },
       {

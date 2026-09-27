@@ -167,18 +167,18 @@ body.course-delete-open{overflow:hidden}
   <div class="course-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="courseDeleteTitle">
     <div class="course-delete-head">
       <div>
-        <span class="courses-kicker">ARCHIVE COURSE</span>
+        <span class="courses-kicker">DELETE COURSE</span>
         <h2 id="courseDeleteTitle">Are you sure?</h2>
-        <p>This will permanently delete <strong id="courseDeleteName">this course</strong> and its course content. This action cannot be undone.</p>
+        <p>This removes <strong id="courseDeleteName">this course</strong> from the Training admin portal. The course record, enrollments, learner progress, orders, certificates, and historical data remain preserved in Supabase.</p>
       </div>
       <button type="button" class="course-delete-close" data-course-delete-close aria-label="Close">×</button>
     </div>
     <div class="course-delete-warning">
-      Only delete the course if you are certain it is no longer needed.
+      This is a soft delete. No LMS history is physically deleted from Supabase.
     </div>
     <div class="course-delete-actions">
       <button type="button" class="courses-btn" data-course-delete-close>Cancel</button>
-      <button type="button" class="courses-btn danger" id="courseDeleteConfirm">Archive Course</button>
+      <button type="button" class="courses-btn danger" id="courseDeleteConfirm">Delete Course</button>
     </div>
   </div>
 </div>
@@ -197,8 +197,8 @@ body.course-delete-open{overflow:hidden}
 
 
 
-<script src="assets/js/admin-lms-courses.js?v=20260918-direct-edit-v2"></script>
-<script src="assets/js/enterprise-portal.js?v=20260927-business-ownership2"></script>
+<script src="assets/js/admin-lms-courses.js?v=20260927-soft-delete6"></script>
+<script src="assets/js/enterprise-portal.js?v=20260927-lms-urls5"></script>
 
 <!-- screenings4u universal portal security -->
 </body>
