@@ -1,27 +1,27 @@
-/* screenings4u Training workspace — shared readable typography baseline.
-   Add this stylesheet after enterprise-management-system.css on Training pages as they are stabilized. */
+/* screenings4u Training workspace — shared Enterprise typography baseline.
+   All font sizes use rem so A− / A / A+ scale the entire page through the portal root font scale. */
 body.ep-enterprise-shell .training-overview-page,
 body.ep-enterprise-shell .training-standard-page{
-  font-size:16px!important;
-  line-height:1.5!important;
+  font-size:1rem!important;
+  line-height:1.45!important;
   color:var(--s4u-ink,#10264a)!important;
 }
 body.ep-enterprise-shell .training-overview-page p,
 body.ep-enterprise-shell .training-standard-page p{
-  font-size:14px!important;
-  line-height:1.55!important;
+  font-size:.88rem!important;
+  line-height:1.5!important;
 }
 body.ep-enterprise-shell .training-standard-btn{
-  min-height:40px!important;
-  padding:0 14px!important;
+  min-height:2.45rem!important;
+  padding:0 .85rem!important;
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
   border:1px solid #cfd9e6!important;
-  border-radius:9px!important;
+  border-radius:.55rem!important;
   background:#fff!important;
   color:#24467f!important;
-  font-size:13px!important;
+  font-size:.82rem!important;
   line-height:1!important;
   font-weight:800!important;
   text-decoration:none!important;
@@ -32,3 +32,9 @@ body.ep-enterprise-shell .training-standard-btn.primary{
   color:#fff!important;
 }
 body.ep-enterprise-shell .training-standard-btn:hover{box-shadow:0 4px 14px rgba(36,70,127,.1)!important}
+
+/* Step 3 layout normalization */
+body.ep-enterprise-shell .training-order-create-page{box-sizing:border-box!important;}
+body.ep-enterprise-shell .training-order-create-page *,body.ep-enterprise-shell .training-order-create-page *::before,body.ep-enterprise-shell .training-order-create-page *::after{box-sizing:border-box;}
+body.ep-enterprise-shell .training-order-create-page .admin-page-eyebrow{font-size:.7rem!important;letter-spacing:.05em!important;}
+body.ep-enterprise-shell .training-order-create-page input,body.ep-enterprise-shell .training-order-create-page select,body.ep-enterprise-shell .training-order-create-page textarea,body.ep-enterprise-shell .training-order-create-page button{font-family:inherit!important;}

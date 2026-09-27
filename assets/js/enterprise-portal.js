@@ -55,7 +55,7 @@ const modules={
    ['admin-testing-customers.html','Customers & Employers','user'],['admin-testing-portal-access.html','Portal Access','settings'],['admin-testing-proposals.html','Proposals','crm'],['admin-testing-background-checks.html','Background Checks','services']]],
   ['Resources & Content',[
    ['admin-testing-documents.html','Private Documents','docs'],['admin-testing-collectors.html','Collector Network','workforce'],['admin-testing-services.html','Services & Pricing','services'],['admin-testing-blog.html','Blog Editor','docs'],['admin-testing-reports.html','Reports','audit']]]]},
- training:{label:'Training',landing:'admin-lms-courses.html',product:'training',groups:[
+ training:{label:'Training',landing:'admin-lms-dashboard.html',product:'training',groups:[
   ['Learner Management',[
    ['admin-lms-enrollments.html','Enrollments'],['admin-lms-progress.html','Learner Progress'],['admin-lms-documents.html','Learner Documents','docs'],['admin-lms-certificates.html','Certificates','docs']]],
   ['Course Management',[
