@@ -323,6 +323,7 @@
   }
 
   function setupActions(action){
+    document.querySelectorAll('[data-finance-refresh]').forEach(b=>{b.onclick=async()=>{b.disabled=true;try{await loadDataOnly();toast('Financial data refreshed.')}catch(e){err(e)}finally{b.disabled=false}}});
     const box=$('.ep-business-actions');if(!box||box.dataset.ready)return;
     box.dataset.ready='1';
     addTop('Refresh Sources',syncSources,false);

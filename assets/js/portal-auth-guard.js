@@ -145,8 +145,13 @@
       "font:700 14px Inter,Arial,sans-serif",
       "cursor:pointer"
     ].join(";");
-    retryButton.addEventListener("click", () => {
-      window.location.reload();
+    retryButton.addEventListener("click", async () => {
+      retryButton.disabled = true;
+      retryButton.textContent = "Checking…";
+      screen.remove();
+      document.documentElement.classList.remove("s4u-auth-error");
+      document.documentElement.classList.add("s4u-auth-pending");
+      await protectPortal({ portal, loginPage });
     });
 
     const loginLink = document.createElement("a");
