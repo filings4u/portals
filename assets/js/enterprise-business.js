@@ -1,7 +1,7 @@
 (()=>{'use strict';
 const $=(s,r=document)=>r.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const kind=document.body.dataset.enterpriseBusiness||'';
-const WF='https://wyezpseboxbmkedvbmyx.supabase.co/functions/v1/workforce-internal-gateway',WM='https://wyezpseboxbmkedvbmyx.supabase.co/functions/v1/workforce-enterprise-management',DM='https://wyezpseboxbmkedvbmyx.supabase.co/functions/v1/dot-enterprise-management',WFK='sb_publishable__BLewZS6h2V4yUczky-BTQ_EemiOdDL';
+const WF='https://elpbnytpciqnbexiaebp.supabase.co/functions/v1/workforce-internal-gateway',WM='https://elpbnytpciqnbexiaebp.supabase.co/functions/v1/workforce-enterprise-management',DM='https://elpbnytpciqnbexiaebp.supabase.co/functions/v1/dot-enterprise-management',WFK='sb_publishable_xVI6Mjkk1bNVMGHZCPuK6w_8FSHKdkC';
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n||0));
 const date=d=>d?new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric'}).format(new Date(d)):'—';
 const statusClass=s=>['paid','completed','active','published','delivered','closed'].includes(String(s||'').toLowerCase())?'good':['failed','cancelled','inactive','refunded','overdue'].includes(String(s||'').toLowerCase())?'bad':'warn';

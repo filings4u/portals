@@ -1,6 +1,6 @@
 (()=>{
 "use strict";
-let db=null,stripe=null,elements=null,invoice=null,token="",invoiceId="";
+let db=null,stripe=null,elements=null,paymentElement=null,invoice=null,token="",invoiceId="";
 const $=id=>document.getElementById(id);
 const money=(v,c="USD")=>{try{return new Intl.NumberFormat("en-US",{style:"currency",currency:c||"USD"}).format(Number(v||0))}catch{return "$"+Number(v||0).toFixed(2)}};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
@@ -67,7 +67,8 @@ async function setupPayment(){
   if(!d.publishableKey||!d.clientSecret)throw Error("Secure payment is not configured.");
   stripe=Stripe(d.publishableKey);
   elements=stripe.elements({clientSecret:d.clientSecret});
-  elements.create("payment",{layout:"tabs"}).mount("#paymentElement");
+  paymentElement=elements.create("payment",{layout:"tabs"});
+  paymentElement.mount("#paymentElement");
   $("paymentForm").hidden=false;
   $("paymentForm").addEventListener("submit",pay,{once:false});
 }
@@ -90,6 +91,7 @@ async function waitForPaid(){
     invoice=d.invoice||invoice; render(invoice);
     if(String(invoice.status)==="paid" || Number(invoice.amount_due||0)<=0){
       $("paymentForm").hidden=true; $("paidState").hidden=false;
+      if(paymentElement){try{paymentElement.unmount()}catch(_){}paymentElement=null}
       msg(`Payment received. A receipt from ${invoice.issuer_legal_name||"screenings4u, LLC"} has been emailed to you.`,"ok");
       return;
     }

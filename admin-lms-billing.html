@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/css/enterprise-portal.css?v=20260927-business-architecture1">
   <link rel="stylesheet" href="assets/css/enterprise-business.css">
   <link rel="stylesheet" href="assets/css/enterprise-management-system.css">
-  <link rel="stylesheet" href="assets/css/admin-lms-billing.css?v=20260927-billing1">
+  <link rel="stylesheet" href="assets/css/admin-lms-billing.css?v=20260927-invoice-page2">
   <title>Training Billing & Invoicing | screenings4u Enterprise</title>
 </head>
 <body data-s4u-portal="admin" data-s4u-business="training">
@@ -74,67 +74,6 @@
     </main>
   </div>
 
-  <dialog id="invoiceEditor" class="lms-dialog lms-dialog-wide">
-    <form method="dialog" class="lms-dialog-shell" id="invoiceEditorForm">
-      <header class="lms-dialog-head">
-        <div><span class="lms-billing-eyebrow">TRAINING INVOICE</span><h2 id="invoiceEditorTitle">Create Invoice</h2><p id="invoiceEditorSubtitle">screenings4u Training, LLC</p></div>
-        <button class="lms-icon-btn" type="button" data-close-dialog="invoiceEditor" aria-label="Close">×</button>
-      </header>
-      <div class="lms-dialog-body">
-        <div class="lms-form-grid two">
-          <label><span>Customer name *</span><input id="billCustomerName" autocomplete="organization" required></label>
-          <label><span>Customer email *</span><input id="billCustomerEmail" type="email" autocomplete="email" required></label>
-          <label><span>Issue date *</span><input id="billIssueDate" type="date" required></label>
-          <label><span>Due date</span><input id="billDueDate" type="date"></label>
-          <label><span>Address line 1</span><input id="billAddress1" autocomplete="address-line1"></label>
-          <label><span>Address line 2</span><input id="billAddress2" autocomplete="address-line2"></label>
-          <label><span>City</span><input id="billCity" autocomplete="address-level2"></label>
-          <label><span>State</span><input id="billState" autocomplete="address-level1"></label>
-          <label><span>ZIP / Postal code</span><input id="billPostal" autocomplete="postal-code"></label>
-          <label><span>Invoice status</span><select id="billStatus"><option value="draft">Draft</option><option value="open">Open</option><option value="sent">Sent</option></select></label>
-        </div>
-
-        <section class="lms-line-builder">
-          <div class="lms-section-title"><div><h3>Invoice Items</h3><p>Add a Training product or a custom billing line.</p></div></div>
-          <div class="lms-line-add">
-            <label class="grow"><span>Training product</span><select id="billService"><option value="">Custom line</option></select></label>
-            <label class="grow"><span>Description</span><input id="billLineDescription" placeholder="Training service or fee"></label>
-            <label><span>Qty</span><input id="billLineQty" type="number" min="0.01" step="0.01" value="1"></label>
-            <label><span>Unit price</span><input id="billLinePrice" type="number" min="0" step="0.01" value="0.00"></label>
-            <label><span>Discount</span><input id="billLineDiscount" type="number" min="0" step="0.01" value="0.00"></label>
-            <button class="lms-btn secondary compact" id="addInvoiceLine" type="button">Add Item</button>
-          </div>
-          <div class="lms-billing-table-wrap inset">
-            <table class="lms-billing-table line-table"><thead><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Discount</th><th>Line Total</th><th></th></tr></thead><tbody id="billLineRows"></tbody></table>
-          </div>
-          <div class="lms-invoice-totals"><div><span>Subtotal</span><strong id="billSubtotal">$0.00</strong></div><div><span>Discount</span><strong id="billDiscountTotal">$0.00</strong></div><div class="grand"><span>Total</span><strong id="billTotal">$0.00</strong></div></div>
-        </section>
-
-        <div class="lms-form-grid two">
-          <label><span>Terms</span><textarea id="billTerms" rows="4" placeholder="Payment terms"></textarea></label>
-          <label><span>Notes</span><textarea id="billNotes" rows="4" placeholder="Internal/customer invoice notes"></textarea></label>
-        </div>
-      </div>
-      <footer class="lms-dialog-foot"><button class="lms-btn secondary" type="button" data-close-dialog="invoiceEditor">Cancel</button><button class="lms-btn primary" id="saveInvoice" type="button">Save Invoice</button></footer>
-    </form>
-  </dialog>
-
-  <dialog id="invoiceManager" class="lms-dialog lms-dialog-wide">
-    <div class="lms-dialog-shell">
-      <header class="lms-dialog-head"><div><span class="lms-billing-eyebrow">INVOICE MANAGEMENT</span><h2 id="manageInvoiceTitle">Invoice</h2><p id="manageInvoiceMeta"></p></div><button class="lms-icon-btn" type="button" data-close-dialog="invoiceManager" aria-label="Close">×</button></header>
-      <div class="lms-dialog-body" id="manageInvoiceBody"></div>
-      <footer class="lms-dialog-foot lms-manage-actions">
-        <button class="lms-btn secondary" id="manageEdit" type="button">Edit</button>
-        <button class="lms-btn secondary" id="manageDownload" type="button">Download PDF</button>
-        <button class="lms-btn secondary" id="manageCopyLink" type="button">Copy Payment Link</button>
-        <button class="lms-btn primary" id="manageSend" type="button">Send Invoice</button>
-        <button class="lms-btn success" id="managePaid" type="button">Mark Paid</button>
-        <button class="lms-btn danger" id="manageVoid" type="button">Void Invoice</button>
-        <button class="lms-btn secondary" type="button" data-close-dialog="invoiceManager">Close</button>
-      </footer>
-    </div>
-  </dialog>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase-config.js?v=20260925-fast-auth"></script>
   <script src="assets/js/core-auth.js?v=20260925-fast-auth"></script>
@@ -145,6 +84,7 @@
   <script src="assets/js/ui.js"></script>
   <script src="assets/js/enterprise-portal.js?v=20260927-step14-billing1"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-  <script src="assets/js/admin-lms-billing.js?v=20260927-billing1"></script>
+  <script src="assets/js/business-documents.js?v=20260927-invoice-page2"></script>
+  <script src="assets/js/admin-lms-billing.js?v=20260927-invoice-page2"></script>
 </body>
 </html>

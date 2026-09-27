@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const END='https://wyezpseboxbmkedvbmyx.supabase.co/functions/v1/dot-enterprise-management',KEY='sb_publishable__BLewZS6h2V4yUczky-BTQ_EemiOdDL';
+const END='https://elpbnytpciqnbexiaebp.supabase.co/functions/v1/dot-enterprise-management',KEY='sb_publishable_xVI6Mjkk1bNVMGHZCPuK6w_8FSHKdkC';
 const root=document.getElementById('dotCustomerWorkspace'),q=new URLSearchParams(location.search),type=String(q.get('type')||''),id=String(q.get('id')||'');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=d=>{if(!d)return'—';const x=new Date(d);return Number.isNaN(x.getTime())?String(d):x.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};

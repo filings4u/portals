@@ -109,7 +109,7 @@ const explicit={
  'admin-testing-catalog.html':'testing','admin-training-catalog.html':'training','admin-lms-orders.html':'training','admin-lms-group-seats.html':'training','admin-lms-group-seat.html':'training','admin-lms-documents.html':'training','admin-lms-certificates.html':'training','admin-lms-reports.html':'training','admin-workforce-catalog.html':'workforce','admin-dot-catalog.html':'dot',
  'admin-finance-ar.html':'finance','admin-finance-ap.html':'finance','admin-finance-invoices.html':'finance','admin-finance-accounting.html':'finance','admin-finance-statements.html':'finance','admin-finance-orders.html':'finance','admin-invoices.html':'finance','admin-invoice.html':'finance','admin-checkout.html':'finance','admin-discounts.html':'finance','admin-revenue-service-management.html':'finance',
  'admin-testing-support.html':'testing','admin-testing-billing.html':'testing','admin-testing-invoices.html':'testing','admin-testing-settings.html':'testing',
- 'admin-training-support.html':'training','admin-training-billing.html':'training','admin-training-invoices.html':'training','admin-training-settings.html':'training',
+ 'admin-training-support.html':'training','admin-training-billing.html':'training','admin-training-invoices.html':'training','admin-training-settings.html':'training','admin-lms-invoice.html':'training',
  'admin-workforce-settings.html':'workforce','admin-workforce-invoices.html':'workforce',
  'admin-dot-settings.html':'dot','admin-dot-invoices.html':'dot' 
 };
