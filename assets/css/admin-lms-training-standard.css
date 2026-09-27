@@ -1,0 +1,34 @@
+/* screenings4u Training workspace — shared readable typography baseline.
+   Add this stylesheet after enterprise-management-system.css on Training pages as they are stabilized. */
+body.ep-enterprise-shell .training-overview-page,
+body.ep-enterprise-shell .training-standard-page{
+  font-size:16px!important;
+  line-height:1.5!important;
+  color:var(--s4u-ink,#10264a)!important;
+}
+body.ep-enterprise-shell .training-overview-page p,
+body.ep-enterprise-shell .training-standard-page p{
+  font-size:14px!important;
+  line-height:1.55!important;
+}
+body.ep-enterprise-shell .training-standard-btn{
+  min-height:40px!important;
+  padding:0 14px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:1px solid #cfd9e6!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  color:#24467f!important;
+  font-size:13px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  text-decoration:none!important;
+}
+body.ep-enterprise-shell .training-standard-btn.primary{
+  background:#24467f!important;
+  border-color:#24467f!important;
+  color:#fff!important;
+}
+body.ep-enterprise-shell .training-standard-btn:hover{box-shadow:0 4px 14px rgba(36,70,127,.1)!important}
