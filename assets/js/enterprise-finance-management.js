@@ -13,10 +13,24 @@
     'admin-finance-invoices.html':['invoices','Invoicing',['Invoice','Company','Customer','Status','Payment','Total','Outstanding','Source']],
     'admin-finance-accounting.html':['accounting','Accounting',['Entry','Date','Company','Description','Status','Debits','Credits','Actions']],
     'admin-finance-statements.html':['statements','Financial Statements',['Statement','Amount']],
-    'admin-finance-orders.html':['orders','All Orders',['Number','Company','Type','Customer','Status','Payment','Total','Date','Actions']]
+    'admin-finance-orders.html':['orders','All Orders',['Number','Company','Type','Customer','Status','Payment','Total','Date','Actions']],
+    'admin-testing-billing.html':['ar','Testing Billing & Receivables',['Invoice','Company','Customer','Status','Due date','Total','Outstanding']],
+    'admin-testing-invoices.html':['invoices','Testing Invoices',['Invoice','Company','Customer','Status','Payment','Total','Outstanding','Source']],
+    'admin-training-billing.html':['ar','Training Billing & Receivables',['Invoice','Company','Customer','Status','Due date','Total','Outstanding']],
+    'admin-training-invoices.html':['invoices','Training Invoices',['Invoice','Company','Customer','Status','Payment','Total','Outstanding','Source']],
+    'admin-workforce-billing.html':['ar','Workforce Billing & Receivables',['Invoice','Company','Customer','Status','Due date','Total','Outstanding']],
+    'admin-workforce-invoices.html':['invoices','Workforce Invoices',['Invoice','Company','Customer','Status','Payment','Total','Outstanding','Source']],
+    'admin-dot-billing.html':['ar','DOT Billing & Receivables',['Invoice','Company','Customer','Status','Due date','Total','Outstanding']],
+    'admin-dot-invoices.html':['invoices','DOT Invoices',['Invoice','Company','Customer','Status','Payment','Total','Outstanding','Source']]
+  };
+  const fixedEntities={
+    'admin-testing-billing.html':'screenings4u','admin-testing-invoices.html':'screenings4u',
+    'admin-training-billing.html':'training','admin-training-invoices.html':'training',
+    'admin-workforce-billing.html':'workforce','admin-workforce-invoices.html':'workforce',
+    'admin-dot-billing.html':'dot','admin-dot-invoices.html':'dot'
   };
 
-  let state={data:null,overview:null,model:null,entityCode:localStorage.getItem('s4u_finance_entity')||'consolidated'};
+  let state={data:null,overview:null,model:null,entityCode:fixedEntities[page]||localStorage.getItem('s4u_finance_entity')||'consolidated'};
 
   async function client(){
     for(let i=0;i<50;i++){
@@ -72,6 +86,12 @@
     const host=$('.finance-entity');
     if(!host||host.dataset.selectorReady)return;
     host.dataset.selectorReady='1';
+    if(fixedEntities[page]){
+      state.entityCode=fixedEntities[page];
+      const rec=selectedEntityRecord();
+      host.innerHTML=`<span class="finance-entity-summary"><strong>${esc(rec?.legal_name||state.entityCode)}</strong> · business-owned billing records</span>`;
+      return;
+    }
     host.innerHTML=`<label class="finance-entity-select"><span>Company</span><select id="financeEntitySelector"></select></label><span id="financeEntitySummary" class="finance-entity-summary"></span>`;
     const sel=$('#financeEntitySelector');
     sel.innerHTML=entityOptions(true).map(x=>`<option value="${esc(x.value)}">${esc(x.label)}</option>`).join('');
@@ -292,6 +312,16 @@
     if(newInvoice)newInvoice.href=`admin-invoice.html${selectedEntity()!=='consolidated'?`?entity=${encodeURIComponent(selectedEntity())}`:''}`;
   }
 
+  function printStatements(){
+    const old=document.title;document.title='screenings4u Enterprise Financial Statements';window.print();document.title=old;
+  }
+  function exportStatements(){
+    const p=state.data?.profit_and_loss||{},b=state.data?.balance_sheet||{};
+    const rows=[['Statement','Amount'],['Revenue',p.revenue||0],['Expenses',p.expenses||0],['Net Income',p.net_income||0],['Assets',b.assets||0],['Liabilities',b.liabilities||0],['Equity',b.equity||0]];
+    const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='screenings4u-enterprise-financial-statements.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+
   function setupActions(action){
     const box=$('.ep-business-actions');if(!box||box.dataset.ready)return;
     box.dataset.ready='1';
@@ -301,6 +331,7 @@
     if(action==='invoices'){
       const a=document.createElement('a');a.dataset.financeNewInvoice='1';a.href='admin-invoice.html';a.className='ep-business-btn primary';a.textContent='New Invoice';box.prepend(a);
     }
+    if(action==='statements'){addTop('Export CSV',exportStatements,false);addTop('Print Statements',printStatements,true)}
   }
 
   async function load(){

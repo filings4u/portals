@@ -10,7 +10,7 @@
 <section class="ep2-dashboard">
   <div id="pageError" class="ep2-alert" hidden></div>
   <section class="ep2-hero">
-    <div><span class="ep2-kicker">screenings4u Enterprise Control Plane</span><h1>Operate all four businesses from one portal.</h1><p>Testing, Training, NON-DOT Workforce, and DOT remain separate operating systems underneath. Enterprise gives internal staff one governed management layer across all four.</p><div class="ep2-hero-actions"><a class="ep2-btn primary" href="admin-organizations.html">Open customer directory</a><a class="ep2-btn" href="admin-work-management.html">Open task manager</a></div></div>
+    <div><span class="ep2-kicker">screenings4u Enterprise Control Plane</span><h1>Operate all four businesses from one portal.</h1><p>Testing, Training, NON-DOT Workforce, and DOT remain separate operating systems underneath. Enterprise gives internal staff one governed management layer across all four.</p><div class="ep2-hero-actions"><a class="ep2-btn primary" href="admin-organizations.html">Open customer directory</a><a class="ep2-btn" href="admin-work-management.html">Open task manager</a><a class="ep2-btn" href="admin-finance-statements.html">Financial statements</a></div></div>
     <div class="ep2-health"><span class="ep2-live-dot"></span><div><strong id="controlPlaneStatus">Checking control plane…</strong><small id="controlPlaneDetail">Validating production services</small></div></div>
   </section>
   <section class="ep2-metrics" id="executiveMetrics"><article><span>Enterprise Accounts</span><strong>—</strong><small>Loading</small></article><article><span>Organizations</span><strong>—</strong><small>Loading</small></article><article><span>People</span><strong>—</strong><small>Loading</small></article><article><span>Open Work Items</span><strong>—</strong><small>Loading</small></article></section>
@@ -20,6 +20,15 @@
       <a class="ep2-business training" href="admin-lms-courses.html"><b>Training</b><strong>Training & LMS Management</strong><p>The existing LMS management system is retained. We will verify its full workflow after the Enterprise production recovery.</p><span>LMS retained →</span></a>
       <a class="ep2-business workforce" href="admin-operations-command-center.html?business=workforce"><b>NON-DOT Workforce</b><strong>Workforce Operations</strong><p>Employers, employees, programs, random pools, compliance, services, billing, and customer setup.</p><span id="workforceCount">Open workspace →</span></a>
       <a class="ep2-business dot" href="admin-operations-command-center.html?business=dot"><b>DOT</b><strong>DOT Compliance Operations</strong><p>C/TPAs, employers, drivers, pools, selections, agency compliance, testing, services, and billing.</p><span id="dotCount">Open workspace →</span></a>
+    </div>
+  </section>
+
+  <section class="ep2-section"><div class="ep2-section-head"><div><span>Enterprise finance</span><h2>Consolidated financial management across all businesses.</h2><p>Review receivables, invoices, orders, payables, accounting, and printable financial statements across Testing, Training, NON-DOT Workforce, and DOT.</p></div><a href="admin-finance-statements.html">Open financial statements →</a></div>
+    <div class="ep2-business-grid">
+      <a class="ep2-business" href="admin-finance-ar.html"><b>Receivables</b><strong>Consolidated AR</strong><p>Company-wide receivables with legal-entity drilldown.</p><span>Open receivables →</span></a>
+      <a class="ep2-business" href="admin-finance-invoices.html"><b>Invoicing</b><strong>All Business Invoices</strong><p>Review invoices across every operating business.</p><span>Open invoices →</span></a>
+      <a class="ep2-business" href="admin-finance-accounting.html"><b>Accounting</b><strong>Enterprise Books</strong><p>Company books, journals, and chart of accounts by legal entity.</p><span>Open accounting →</span></a>
+      <a class="ep2-business" href="admin-finance-statements.html"><b>Statements</b><strong>Financial Statements</strong><p>Consolidated and entity-level statements with print and CSV export.</p><span>Open statements →</span></a>
     </div>
   </section>
   <section class="ep2-section"><div class="ep2-section-head"><div><span>Enterprise rebuild</span><h2>Phase 1–15 management workspaces</h2><p>Every completed consolidation phase is exposed here as an operating workspace, not hidden behind legacy URLs.</p></div><a href="admin-legacy-routes.html">View route registry →</a></div>
@@ -36,7 +45,7 @@
 <script src="assets/js/core-auth.js?v=20260925-fast-auth"></script>
 <script src="assets/js/session-security.js?v=20260925-fast-auth"></script>
 <script src="assets/js/portal-auth-guard.js?v=20260925-fast-auth"></script>
-<script src="assets/js/admin-auth-guard.js?v=20260925-fast-auth"></script><script src="assets/js/enterprise-management-system.js?v=20260924-design-v5"></script><script src="assets/js/ui.js"></script><script src="assets/js/enterprise-portal.js?v=20260924-design-v5"></script><script src="assets/js/enterprise-dashboard.js?v=20260924-prod-ui-1"></script>
+<script src="assets/js/admin-auth-guard.js?v=20260925-fast-auth"></script><script src="assets/js/enterprise-management-system.js?v=20260924-design-v5"></script><script src="assets/js/ui.js"></script><script src="assets/js/enterprise-portal.js?v=20260927-business-architecture1"></script><script src="assets/js/enterprise-dashboard.js?v=20260924-prod-ui-1"></script>
 
 <!-- screenings4u universal portal security -->
 </body></html>
