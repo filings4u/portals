@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>DOT Workspace Pilot | screenings4u</title>
+<style>
+:root{font-family:Inter,Arial,sans-serif;color:#183451;background:#f4f7fb}*{box-sizing:border-box}body{margin:0}header{background:#fff;border-bottom:1px solid #dce5ef;padding:20px max(20px,calc((100vw - 1240px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px}header strong{font-size:22px;color:#325aa3}header span{color:#ff6b00}button{cursor:pointer;font:inherit}#signout{background:#fff;border:1px solid #c9d7e7;border-radius:8px;padding:9px 13px}main{max-width:1240px;margin:38px auto;padding:0 20px}h1{font-size:clamp(26px,4vw,38px);margin:0 0 10px}p{line-height:1.6;color:#5c6e80}.panel{background:#fff;border:1px solid #dce5ef;border-radius:16px;padding:28px;max-width:720px;box-shadow:0 10px 35px #1e3b5d0a}.fields{display:grid;gap:13px;margin-top:19px}label{font-weight:700;font-size:13px}input{display:block;width:100%;margin-top:7px;padding:13px;border:1px solid #c9d7e7;border-radius:8px;font-size:15px}.primary{background:#ff6b00;color:#fff;border:0;border-radius:9px;padding:13px 19px;font-weight:800}.primary:disabled{opacity:.55;cursor:wait}#message{min-height:25px;color:#7d3740}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:24px}.card{background:#fff;border:1px solid #dce5ef;border-radius:13px;padding:20px;text-align:left;min-height:155px}.card:hover{border-color:#325aa3}.card strong{display:block;font-size:17px;margin-bottom:8px}.card small{color:#66788a;line-height:1.5}.card:disabled{opacity:.6}.tag{display:inline-block;color:#325aa3;background:#eaf1fb;font-size:11px;font-weight:800;padding:5px 8px;border-radius:20px;margin-bottom:12px}.muted{font-size:13px;color:#66788a}.hidden{display:none!important}footer{margin-top:50px;border-top:1px solid #dce5ef;padding:20px;text-align:center;font-size:12px;color:#6c7c8e}@media(max-width:550px){header{padding:16px}main{margin-top:24px}.panel{padding:20px}}
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head>
+<body><header><strong>screenings<span>4u</span> <small style="font-size:12px;color:#72849b">DOT Pilot</small></strong><button id="signout" class="hidden" type="button">Sign out</button></header>
+<main><h1>Unified DOT Workspace</h1><p>A secure pilot for C/TPAs, employers, drivers, employees and owner-operators. Your accessible workspaces are verified using the existing DOT authorization service.</p>
+<section id="login" class="panel"><h2>Sign in</h2><p>Use your existing screenings4u account.</p><form id="login-form" class="fields"><label>Email<input id="email" type="email" autocomplete="username" required></label><label>Password<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">Sign in</button></form></section>
+<section id="workspace" class="hidden"><h2>Available DOT workspaces</h2><p id="who"></p><div id="cards" class="cards" aria-live="polite"></div><p class="muted">This pilot checks existing access but does not grant new permissions or replace any current portal. Access to a specific workspace remains enforced by its existing server-side checks.</p></section><p id="message" role="status" aria-live="polite"></p></main><footer>screenings4u · Internal pilot — existing DOT portals remain unchanged</footer>
+<script>
+(()=>{'use strict';
+const ROOT='https://elpbnytpciqnbexiaebp.supabase.co';
+const KEY='sb_publishable_xVI6Mjkk1bNVMGHZCPuK6w_8FSHKdkC';
+const sb=window.supabase.createClient(ROOT,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'s4u-unified-dot-pilot-auth'}});
+const $=id=>document.getElementById(id),message=t=>{$('message').textContent=t||''};
+const portals=[
+{code:'ctpa_dot',label:'C/TPA',note:'Manage DOT sponsored employer programs'},
+{code:'ctpa_employer_dot',label:'Sponsored Employer',note:'Employer services under a C/TPA'},
+{code:'employer_dot',label:'Direct Employer',note:'DOT program and workforce management'},
+{code:'driver_dot',label:'Driver',note:'Your FMCSA records and testing'},
+{code:'employee_dot',label:'Employee',note:'Personal DOT records and training'},
+{code:'owner_operator',label:'Owner-Operator',note:'Personal compliance and DOT programs'}
+];
+async function verify(session,code){
+try{const res=await fetch(ROOT+'/functions/v1/dot-session-context',{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+session.access_token},body:JSON.stringify({portal_code:code})});
+if(!res.ok)return null;const result=await res.json();return result.ok&&result.has_access===true?result:null}catch{return null}}
+async function refresh(){
+const {data:{session}}=await sb.auth.getSession();
+$('login').classList.toggle('hidden',!!session);$('workspace').classList.toggle('hidden',!session);$('signout').classList.toggle('hidden',!session);
+if(!session)return;
+$('who').textContent='Signed in as '+(session.user.email||'your account');
+const cards=$('cards');cards.replaceChildren();message('Checking your existing DOT access…');
+const results=await Promise.all(portals.map(async p=>({p,result:await verify(session,p.code)})));
+for(const {p,result} of results){if(!result)continue;
+const el=document.createElement('button');el.className='card';el.type='button';
+const tag=document.createElement('span');tag.className='tag';tag.textContent=result.requires_workspace_selection?'Workspace selection required':'Access verified';
+const title=document.createElement('strong');title.textContent=p.label;
+const note=document.createElement('small');note.textContent=p.note;
+el.append(tag,title,note);el.onclick=()=>{if(result.requires_workspace_selection){message('Multiple '+p.label+' workspaces found. This pilot does not choose one automatically; use your current portal for now.');return}message(p.label+' is available. Continue using your existing portal while the consolidated dashboard is built.')};
+cards.append(el)}
+message(cards.childElementCount?'':'No eligible DOT workspaces were confirmed. Existing accounts and portal access have not been changed.');
+}
+$('login-form').addEventListener('submit',async e=>{e.preventDefault();message('Signing in…');const button=e.target.querySelector('button');button.disabled=true;try{const {error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;$('password').value='';await refresh()}catch(err){message(err.message||'Sign in failed')}finally{button.disabled=false}});
+$('signout').onclick=async()=>{await sb.auth.signOut();$('cards').replaceChildren();message('Signed out');await refresh()};
+refresh().catch(()=>message('Unable to verify session. Please try again.'));
+})();
+</script></body></html>
